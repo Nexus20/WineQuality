@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WineQuality.Application.Interfaces.Infrastructure;
+using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Infrastructure.Identity;
 using WineQuality.Infrastructure.Persistence;
+using WineQuality.Infrastructure.Repositories;
 
 namespace WineQuality.Infrastructure;
 
@@ -32,7 +34,8 @@ public static class InfrastructureServicesRegistration
         // services.AddScoped<IHealthMeasurementsContext, HealthMeasurementsContext>();
         // services.AddScoped<IMongoHealthMeasurementRepository, MongoHealthMeasurementRepository>();
         //
-        // services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
+        services.AddTransient<IUnitOfWork, UnitOfWork>();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         // services.AddScoped<IHospitalRepository, HospitalRepository>();
         // services.AddScoped<IDoctorRepository, DoctorRepository>();
         // services.AddScoped<IPatientRepository, PatientRepository>();

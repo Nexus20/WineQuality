@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WineQuality.Application.Interfaces.Services;
+using WineQuality.Application.Services;
 
 namespace WineQuality.Application;
 
@@ -13,7 +15,8 @@ public static class ApplicationServicesRegistration
         // services.AddSingleton<HeartRateTimerManager>();
         
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        // services.AddScoped<IHospitalService, HospitalService>();
+        services.AddScoped<IProcessPhaseTypeService, ProcessPhaseTypeService>();
+        services.AddScoped<IProcessParameterService, ProcessParameterService>();
         // services.AddScoped<IDoctorService, DoctorService>();
         // services.AddScoped<IPatientService, PatientService>();
         // services.AddScoped<IHospitalAdministratorService, HospitalAdministratorService>();

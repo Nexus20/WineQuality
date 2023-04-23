@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WineQuality.Application.Interfaces.Infrastructure;
 using WineQuality.Application.Interfaces.Persistence;
+using WineQuality.Application.Interfaces.Services;
+using WineQuality.Infrastructure.Auth;
 using WineQuality.Infrastructure.Identity;
 using WineQuality.Infrastructure.Persistence;
 using WineQuality.Infrastructure.Repositories;
@@ -43,6 +45,8 @@ public static class InfrastructureServicesRegistration
         // services.AddScoped<IPatientCaretakerRepository, PatientCaretakerRepository>();
         
         services.AddScoped<IIdentityInitializer, IdentityInitializer>();
+        services.AddScoped<ISignInService, SignInService>();
+        services.AddScoped<JwtHandler>();
 
         return services;
     }

@@ -1,0 +1,6 @@
+namespace WineQuality.Application.Models.Requests.ProcessPhaseTypes;
+
+public class GetProcessPhaseTypesRequest
+{
+    
+}

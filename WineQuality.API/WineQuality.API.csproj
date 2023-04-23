@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\WineQuality.Application\WineQuality.Application.csproj" />
+      <ProjectReference Include="..\WineQuality.Infrastructure\WineQuality.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

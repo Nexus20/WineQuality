@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WineQuality.API", "WineQuality.API\WineQuality.API.csproj", "{B3429034-FC2A-4555-83AF-28D134CC404F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WineQuality.Domain", "WineQuality.Domain\WineQuality.Domain.csproj", "{C5F82A19-B954-4962-BF0E-53C63E6877A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WineQuality.Application", "WineQuality.Application\WineQuality.Application.csproj", "{3FC5CB34-EEAE-4442-B54D-06E9845CC05E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WineQuality.Infrastructure", "WineQuality.Infrastructure\WineQuality.Infrastructure.csproj", "{025C3796-9F51-4EF8-A420-3F277E8AE109}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B3429034-FC2A-4555-83AF-28D134CC404F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3429034-FC2A-4555-83AF-28D134CC404F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3429034-FC2A-4555-83AF-28D134CC404F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3429034-FC2A-4555-83AF-28D134CC404F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5F82A19-B954-4962-BF0E-53C63E6877A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5F82A19-B954-4962-BF0E-53C63E6877A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5F82A19-B954-4962-BF0E-53C63E6877A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5F82A19-B954-4962-BF0E-53C63E6877A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FC5CB34-EEAE-4442-B54D-06E9845CC05E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FC5CB34-EEAE-4442-B54D-06E9845CC05E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FC5CB34-EEAE-4442-B54D-06E9845CC05E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FC5CB34-EEAE-4442-B54D-06E9845CC05E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{025C3796-9F51-4EF8-A420-3F277E8AE109}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{025C3796-9F51-4EF8-A420-3F277E8AE109}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{025C3796-9F51-4EF8-A420-3F277E8AE109}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{025C3796-9F51-4EF8-A420-3F277E8AE109}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -3,7 +3,7 @@ using AutoMapper;
 using WineQuality.Application.Exceptions;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
-using WineQuality.Application.Models.Requests.ProcessPhaseParameters;
+using WineQuality.Application.Models.Requests.ProcessParameters;
 using WineQuality.Application.Models.Results.ProcessParameters;
 using WineQuality.Domain.Entities;
 
@@ -32,7 +32,7 @@ public class ProcessParameterService : IProcessParameterService
         return result;
     }
 
-    public async Task<List<ProcessParameterResult>> GetAsync(GetProcessPhaseParametersRequest request, CancellationToken cancellationToken = default)
+    public async Task<List<ProcessParameterResult>> GetAsync(GetProcessParametersRequest request, CancellationToken cancellationToken = default)
     {
         var predicate = CreateFilterPredicate(request);
         
@@ -94,7 +94,7 @@ public class ProcessParameterService : IProcessParameterService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    private Expression<Func<ProcessParameter, bool>>? CreateFilterPredicate(GetProcessPhaseParametersRequest request)
+    private Expression<Func<ProcessParameter, bool>>? CreateFilterPredicate(GetProcessParametersRequest request)
     {
         Expression<Func<ProcessParameter, bool>>? predicate = null;
 

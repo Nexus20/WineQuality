@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WineQuality.Application.Models.Requests.ProcessPhaseParameters;
+namespace WineQuality.Application.Models.Requests.ProcessParameters;
 
 public class UpdateProcessParameterRequest
 {

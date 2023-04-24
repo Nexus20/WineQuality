@@ -39,7 +39,7 @@ public class IdentityInitializer : IIdentityInitializer
     
     private async Task InitializeSuperAdminRole() {
 
-        var superAdmin = _userManager.Users.FirstOrDefault(u => u.UserName == "root@health-tracking.com") ?? RegisterSuperAdmin();
+        var superAdmin = _userManager.Users.FirstOrDefault(u => u.UserName == "root@wine-quality.com") ?? RegisterSuperAdmin();
 
         var superAdminRole = await RegisterRoleAsync(CustomRoles.SuperAdmin);
 
@@ -51,8 +51,8 @@ public class IdentityInitializer : IIdentityInitializer
 
         var superAdmin = new AppUser() {
             Id = Guid.NewGuid().ToString(),
-            UserName = "root@health-tracking.com",
-            Email = "root@health-tracking.com",
+            UserName = "root@wine-quality.com",
+            Email = "root@wine-quality.com",
             FirstName = "root",
             LastName = "root",
             PhoneNumber = "000"

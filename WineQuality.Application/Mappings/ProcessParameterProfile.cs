@@ -1,5 +1,5 @@
 using AutoMapper;
-using WineQuality.Application.Models.Requests.ProcessPhaseParameters;
+using WineQuality.Application.Models.Requests.ProcessParameters;
 using WineQuality.Application.Models.Results.ProcessParameters;
 using WineQuality.Domain.Entities;
 

@@ -17,6 +17,7 @@ public static class ApplicationServicesRegistration
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.AddScoped<IProcessPhaseTypeService, ProcessPhaseTypeService>();
         services.AddScoped<IProcessParameterService, ProcessParameterService>();
+        services.AddScoped<IGrapeSortService, GrapeSortService>();
         // services.AddScoped<IDoctorService, DoctorService>();
         // services.AddScoped<IPatientService, PatientService>();
         // services.AddScoped<IHospitalAdministratorService, HospitalAdministratorService>();

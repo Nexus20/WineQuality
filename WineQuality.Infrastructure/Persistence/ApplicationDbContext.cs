@@ -11,6 +11,8 @@ namespace WineQuality.Infrastructure.Persistence;
 public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, string, IdentityUserClaim<string>, AppUserRole,
     IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
 {
+    public DbSet<GrapeSort> GrapeSorts { get; set; }
+    public DbSet<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; set; }
     public DbSet<ProcessParameter> ProcessParameters { get; set; }
     public DbSet<ProcessPhaseType> ProcessPhaseTypes { get; set; }
     public DbSet<ProcessPhaseParameter> ProcessPhaseParameters { get; set; }
@@ -18,6 +20,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, string, 
     public DbSet<WineMaterialBatchProcessPhase> WineMaterialBatchProcessPhases { get; set; }
     public DbSet<WineMaterialBatchProcessPhaseParameter> WineMaterialBatchProcessPhaseParameters { get; set; }
     public DbSet<WineMaterialBatchProcessParameterValue> WineMaterialBatchProcessParameterValues { get; set; }
+    public DbSet<FileReference> FileReferences { get; set; }
 
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {

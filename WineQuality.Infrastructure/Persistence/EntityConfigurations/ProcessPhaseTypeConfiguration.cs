@@ -12,6 +12,11 @@ internal class ProcessPhaseTypeConfiguration : IEntityTypeConfiguration<ProcessP
             .WithOne(x => x.PhaseType)
             .HasForeignKey(x => x.PhaseTypeId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(x => x.GrapeSortPhaseForecastModels)
+            .WithOne(x => x.PhaseType)
+            .HasForeignKey(x => x.PhaseTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.NextPhase)
             .WithOne(x => x.PreviousPhase)

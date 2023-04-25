@@ -8,4 +8,5 @@ public class ProcessPhaseType : BaseEntity
     public virtual ProcessPhaseType? NextPhase {get; set;}
     public virtual ProcessPhaseType? PreviousPhase {get; set;}
     public virtual List<ProcessPhaseParameter>? Parameters { get; set; }
+    public virtual List<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; set; }
 }

@@ -8,6 +8,7 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _dbContext;
 
+    public IRepository<GrapeSort> GrapeSorts { get; }
     public IRepository<ProcessParameter> ProcessParameters { get; }
     public IRepository<ProcessPhaseType> ProcessPhaseTypes { get; }
     public IRepository<ProcessPhaseParameter> ProcessPhaseParameters { get; }
@@ -21,7 +22,8 @@ public class UnitOfWork : IUnitOfWork
         IRepository<WineMaterialBatch> wineMaterialBatches,
         IRepository<WineMaterialBatchProcessPhase> wineMaterialBatchProcessPhases,
         IRepository<WineMaterialBatchProcessPhaseParameter> wineMaterialBatchProcessPhaseParameters,
-        IRepository<WineMaterialBatchProcessParameterValue> wineMaterialBatchProcessParameterValues)
+        IRepository<WineMaterialBatchProcessParameterValue> wineMaterialBatchProcessParameterValues,
+        IRepository<GrapeSort> grapeSorts)
     {
         _dbContext = dbContext;
         ProcessParameters = processParameters;
@@ -31,6 +33,7 @@ public class UnitOfWork : IUnitOfWork
         WineMaterialBatchProcessPhases = wineMaterialBatchProcessPhases;
         WineMaterialBatchProcessPhaseParameters = wineMaterialBatchProcessPhaseParameters;
         WineMaterialBatchProcessParameterValues = wineMaterialBatchProcessParameterValues;
+        GrapeSorts = grapeSorts;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

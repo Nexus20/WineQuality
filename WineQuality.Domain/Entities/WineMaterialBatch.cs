@@ -26,4 +26,7 @@ public class WineMaterialBatch : BaseEntity
     public DateTime HarvestDate { get; set; }
     public string HarvestLocation { get; set; } = null!;
     public virtual List<WineMaterialBatchProcessPhase> Phases { get; set; } = null!;
+    
+    public string GrapeSortId { get; set; } = null!;
+    public virtual GrapeSort GrapeSort { get; set; } = null!;
 }

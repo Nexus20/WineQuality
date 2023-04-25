@@ -22,12 +22,12 @@ public class GrapeSortService : IGrapeSortService
 
     public async Task<GrapeSortResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        var source = await _unitOfWork.ProcessPhaseParameters.GetByIdAsync(id, cancellationToken);
+        var source = await _unitOfWork.GrapeSorts.GetByIdAsync(id, cancellationToken);
 
         if (source == null)
-            throw new NotFoundException(nameof(ProcessPhaseParameter), nameof(id));
+            throw new NotFoundException(nameof(GrapeSort), nameof(id));
 
-        var result = _mapper.Map<ProcessPhaseParameter, GrapeSortResult>(source);
+        var result = _mapper.Map<GrapeSort, GrapeSortResult>(source);
 
         return result;
     }
@@ -53,20 +53,20 @@ public class GrapeSortService : IGrapeSortService
         if (duplicateExists)
             throw new ValidationException($"{nameof(GrapeSort)} with such name {request.Name} already exists");
         
-        var processPhaseParameterToAdd = _mapper.Map<CreateGrapeSortRequest, GrapeSort>(request);
+        var grapeSortToAdd = _mapper.Map<CreateGrapeSortRequest, GrapeSort>(request);
 
-        await _unitOfWork.GrapeSorts.AddAsync(processPhaseParameterToAdd);
+        await _unitOfWork.GrapeSorts.AddAsync(grapeSortToAdd);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        var result = _mapper.Map<GrapeSort, GrapeSortResult>(processPhaseParameterToAdd);
+        var result = _mapper.Map<GrapeSort, GrapeSortResult>(grapeSortToAdd);
         return result;
     }
 
     public async Task<GrapeSortResult> UpdateAsync(UpdateGrapeSortRequest request, CancellationToken cancellationToken = default)
     {
-        var processPhaseParameterToUpdate = await _unitOfWork.GrapeSorts.GetByIdAsync(request.Id, cancellationToken);
+        var grapeSortToUpdate = await _unitOfWork.GrapeSorts.GetByIdAsync(request.Id, cancellationToken);
         
-        if (processPhaseParameterToUpdate == null)
+        if (grapeSortToUpdate == null)
             throw new NotFoundException(nameof(GrapeSort), nameof(request.Id));
         
         var duplicateExists = await _unitOfWork.GrapeSorts.ExistsAsync(x => x.Name == request.Name && x.Id != request.Id, cancellationToken);
@@ -74,23 +74,23 @@ public class GrapeSortService : IGrapeSortService
         if (duplicateExists)
             throw new ValidationException($"{nameof(GrapeSort)} with such name {request.Name} already exists");
 
-        _mapper.Map(request, processPhaseParameterToUpdate);
+        _mapper.Map(request, grapeSortToUpdate);
 
-        _unitOfWork.GrapeSorts.Update(processPhaseParameterToUpdate);
+        _unitOfWork.GrapeSorts.Update(grapeSortToUpdate);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        var result = _mapper.Map<GrapeSort, GrapeSortResult>(processPhaseParameterToUpdate);
+        var result = _mapper.Map<GrapeSort, GrapeSortResult>(grapeSortToUpdate);
         return result;
     }
 
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        var processPhaseParameterToDelete = await _unitOfWork.GrapeSorts.GetByIdAsync(id, cancellationToken);
+        var grapeSortToDelete = await _unitOfWork.GrapeSorts.GetByIdAsync(id, cancellationToken);
         
-        if (processPhaseParameterToDelete == null)
+        if (grapeSortToDelete == null)
             throw new NotFoundException(nameof(GrapeSort), nameof(id));
         
-        _unitOfWork.GrapeSorts.Delete(processPhaseParameterToDelete);
+        _unitOfWork.GrapeSorts.Delete(grapeSortToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

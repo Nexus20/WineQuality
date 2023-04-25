@@ -22,7 +22,7 @@ public class ExceptionHandlingMiddleware
             logger.LogInformation(exception, "Validation exception is occured");
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsync(exception.Message);
+            await context.Response.WriteAsync(new ErrorDetails(exception.Message).ToString());
         }
         catch (IdentityException exception)
         {

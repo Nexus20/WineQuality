@@ -22,12 +22,12 @@ public class ProcessParameterService : IProcessParameterService
 
     public async Task<ProcessParameterResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        var source = await _unitOfWork.ProcessPhaseParameters.GetByIdAsync(id, cancellationToken);
+        var source = await _unitOfWork.ProcessParameters.GetByIdAsync(id, cancellationToken);
 
         if (source == null)
-            throw new NotFoundException(nameof(ProcessPhaseParameter), nameof(id));
+            throw new NotFoundException(nameof(ProcessParameter), nameof(id));
 
-        var result = _mapper.Map<ProcessPhaseParameter, ProcessParameterResult>(source);
+        var result = _mapper.Map<ProcessParameter, ProcessParameterResult>(source);
 
         return result;
     }
@@ -53,20 +53,20 @@ public class ProcessParameterService : IProcessParameterService
         if (duplicateExists)
             throw new ValidationException($"{nameof(ProcessParameter)} with such name {request.Name} already exists");
         
-        var processPhaseParameterToAdd = _mapper.Map<CreateProcessParameterRequest, ProcessParameter>(request);
+        var processParameterToAdd = _mapper.Map<CreateProcessParameterRequest, ProcessParameter>(request);
 
-        await _unitOfWork.ProcessParameters.AddAsync(processPhaseParameterToAdd);
+        await _unitOfWork.ProcessParameters.AddAsync(processParameterToAdd);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        var result = _mapper.Map<ProcessParameter, ProcessParameterResult>(processPhaseParameterToAdd);
+        var result = _mapper.Map<ProcessParameter, ProcessParameterResult>(processParameterToAdd);
         return result;
     }
 
     public async Task<ProcessParameterResult> UpdateAsync(UpdateProcessParameterRequest request, CancellationToken cancellationToken = default)
     {
-        var processPhaseParameterToUpdate = await _unitOfWork.ProcessParameters.GetByIdAsync(request.Id, cancellationToken);
+        var processParameterToUpdate = await _unitOfWork.ProcessParameters.GetByIdAsync(request.Id, cancellationToken);
         
-        if (processPhaseParameterToUpdate == null)
+        if (processParameterToUpdate == null)
             throw new NotFoundException(nameof(ProcessParameter), nameof(request.Id));
         
         var duplicateExists = await _unitOfWork.ProcessParameters.ExistsAsync(x => x.Name == request.Name && x.Id != request.Id, cancellationToken);
@@ -74,23 +74,23 @@ public class ProcessParameterService : IProcessParameterService
         if (duplicateExists)
             throw new ValidationException($"{nameof(ProcessParameter)} with such name {request.Name} already exists");
 
-        _mapper.Map(request, processPhaseParameterToUpdate);
+        _mapper.Map(request, processParameterToUpdate);
 
-        _unitOfWork.ProcessParameters.Update(processPhaseParameterToUpdate);
+        _unitOfWork.ProcessParameters.Update(processParameterToUpdate);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        var result = _mapper.Map<ProcessParameter, ProcessParameterResult>(processPhaseParameterToUpdate);
+        var result = _mapper.Map<ProcessParameter, ProcessParameterResult>(processParameterToUpdate);
         return result;
     }
 
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        var processPhaseParameterToDelete = await _unitOfWork.ProcessParameters.GetByIdAsync(id, cancellationToken);
+        var processParameterToDelete = await _unitOfWork.ProcessParameters.GetByIdAsync(id, cancellationToken);
         
-        if (processPhaseParameterToDelete == null)
+        if (processParameterToDelete == null)
             throw new NotFoundException(nameof(ProcessParameter), nameof(id));
         
-        _unitOfWork.ProcessParameters.Delete(processPhaseParameterToDelete);
+        _unitOfWork.ProcessParameters.Delete(processParameterToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

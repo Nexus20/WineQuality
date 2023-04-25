@@ -9,8 +9,8 @@ public class GrapeSortProfile : Profile
 {
     public GrapeSortProfile()
     {
-        CreateMap<CreateGrapeSortRequest, ProcessPhaseParameter>();
-        CreateMap<UpdateGrapeSortRequest, ProcessPhaseParameter>();
+        CreateMap<CreateGrapeSortRequest, GrapeSort>();
+        CreateMap<UpdateGrapeSortRequest, GrapeSort>();
         CreateMap<GrapeSort, GrapeSortResult>();
     }
 }

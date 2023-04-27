@@ -12,5 +12,9 @@ internal class ProcessParameterConfiguration : IEntityTypeConfiguration<ProcessP
             .WithOne(x => x.Parameter)
             .HasForeignKey(x => x.ParameterId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(x => x.Localizations)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

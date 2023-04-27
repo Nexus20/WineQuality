@@ -25,5 +25,9 @@ internal class ProcessPhaseTypeConfiguration : IEntityTypeConfiguration<ProcessP
         builder.HasOne(x => x.PreviousPhase)
             .WithOne(x => x.NextPhase)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(x => x.Localizations)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

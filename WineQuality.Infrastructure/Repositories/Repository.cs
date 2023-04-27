@@ -33,6 +33,14 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
         return DbContext.Set<TEntity>().Where(predicate).ToListAsync(cancellationToken: cancellationToken);
     }
 
+    public Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate, CancellationToken cancellationToken = default)
+    {
+        if (predicate == null)
+            return DbContext.Set<TEntity>().FirstOrDefaultAsync(cancellationToken: cancellationToken);
+        
+        return DbContext.Set<TEntity>().FirstOrDefaultAsync(predicate, cancellationToken: cancellationToken);
+    }
+
     public Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         List<Expression<Func<TEntity, BaseEntity>>>? includes = null,

@@ -55,6 +55,22 @@ public class ProcessPhaseTypeService : IProcessPhaseTypeService
         
         var processPhaseTypeToAdd = _mapper.Map<CreateProcessPhaseTypeRequest, ProcessPhaseType>(request);
 
+        if (!string.IsNullOrWhiteSpace(request.PreviousPhaseId))
+        {
+            var previousPhaseType =
+                await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.PreviousPhaseId, cancellationToken);
+            
+            if(previousPhaseType == null)
+                throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.PreviousPhaseId));
+
+            var phaseWithSamePreviousPhase = await _unitOfWork.ProcessPhaseTypes.FirstOrDefaultAsync(x => x.PreviousPhase != null && x.PreviousPhase.Id == request.PreviousPhaseId, cancellationToken: cancellationToken);
+
+            if (phaseWithSamePreviousPhase != null)
+                throw new ValidationException($"Can't add previous phase type \"{previousPhaseType.Name}\" to phase \"{processPhaseTypeToAdd.Name}\" because phase \"{phaseWithSamePreviousPhase.Name} already has such phase as previous\"");
+
+            processPhaseTypeToAdd.PreviousPhase = previousPhaseType;
+        }
+
         await _unitOfWork.ProcessPhaseTypes.AddAsync(processPhaseTypeToAdd);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         

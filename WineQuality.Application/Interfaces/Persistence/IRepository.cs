@@ -9,6 +9,9 @@ public interface IRepository<TEntity> where TEntity : BaseEntity
     Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? predicate, CancellationToken cancellationToken = default);
 
+    Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate,
+        CancellationToken cancellationToken = default);
+
     Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
         List<Expression<Func<TEntity, BaseEntity>>>? includes = null,

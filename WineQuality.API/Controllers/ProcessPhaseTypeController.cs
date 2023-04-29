@@ -62,4 +62,11 @@ public class ProcessPhaseTypeController : ControllerBase
         await _processPhaseTypeService.DeleteAsync(id);
         return NoContent();
     }
+
+    [HttpPost("add_parameter")]
+    public async Task<IActionResult> AddParameterToPhase([FromBody] AddParameterToPhaseRequest request)
+    {
+        await _processPhaseTypeService.AddParameterAsync(request);
+        return Ok();
+    }
 }

@@ -9,8 +9,8 @@ public class ProcessParameterProfile : Profile
 {
     public ProcessParameterProfile()
     {
-        CreateMap<CreateProcessParameterRequest, ProcessPhaseParameter>();
-        CreateMap<UpdateProcessParameterRequest, ProcessPhaseParameter>();
+        CreateMap<CreateProcessParameterRequest, ProcessParameter>();
+        CreateMap<UpdateProcessParameterRequest, ProcessParameter>();
         CreateMap<ProcessParameter, ProcessParameterResult>()
             .ForMember(d => d.Phases,
                 o => o.MapFrom(s => (s.Phases ?? new List<ProcessPhaseParameter>()).Select(p => p.PhaseType)));

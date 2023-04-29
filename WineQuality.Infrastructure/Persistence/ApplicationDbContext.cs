@@ -23,6 +23,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, string, 
     public DbSet<FileReference> FileReferences { get; set; }
     public DbSet<Localization> Localizations { get; set; }
     public DbSet<Culture> Cultures { get; set; }
+    public DbSet<GrapeSortPhaseDataset> GrapeSortPhaseDatasets { get; set; }
 
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {

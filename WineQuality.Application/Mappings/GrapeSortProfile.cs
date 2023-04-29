@@ -1,4 +1,5 @@
 using AutoMapper;
+using WineQuality.Application.Models.Dtos.Files;
 using WineQuality.Application.Models.Requests.GrapeSorts;
 using WineQuality.Application.Models.Results.GrapeSorts;
 using WineQuality.Domain.Entities;
@@ -12,5 +13,12 @@ public class GrapeSortProfile : Profile
         CreateMap<CreateGrapeSortRequest, GrapeSort>();
         CreateMap<UpdateGrapeSortRequest, GrapeSort>();
         CreateMap<GrapeSort, GrapeSortResult>();
+
+        CreateMap<GrapeSortPhaseDataset, GrapeSortPhaseDatasetResult>()
+            .ForMember(d => d.DatasetInfo, o => o.MapFrom(s => new FileNameWithUrlDto
+            {
+                Url = s.DatasetFileReference.Uri,
+                Name = s.Name
+            }));
     }
 }

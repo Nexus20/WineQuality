@@ -1,13 +1,16 @@
 ﻿using System.Reflection;
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WineQuality.Application.Interfaces.FileStorage;
 using WineQuality.Application.Interfaces.Infrastructure;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Infrastructure.Auth;
+using WineQuality.Infrastructure.FileStorage;
 using WineQuality.Infrastructure.Identity;
 using WineQuality.Infrastructure.Persistence;
 using WineQuality.Infrastructure.Repositories;
@@ -47,6 +50,10 @@ public static class InfrastructureServicesRegistration
         services.AddScoped<IIdentityInitializer, IdentityInitializer>();
         services.AddScoped<ISignInService, SignInService>();
         services.AddScoped<JwtHandler>();
+        
+        var blobStorageConnectionString = configuration.GetValue<string>("BlobStorageSettings:ConnectionString");
+        services.AddSingleton(x => new BlobServiceClient(blobStorageConnectionString));
+        services.AddScoped<IFileStorageService, BlobStorageService>();
 
         return services;
     }

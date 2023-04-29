@@ -98,9 +98,9 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
     }
 
-    public Task AddAsync(TEntity entity)
+    public Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        return DbContext.Set<TEntity>().AddAsync(entity).AsTask();
+        return DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).AsTask();
     }
 
     public void Update(TEntity entity)

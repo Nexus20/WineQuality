@@ -71,7 +71,7 @@ public class ProcessPhaseTypeService : IProcessPhaseTypeService
             processPhaseTypeToAdd.PreviousPhase = previousPhaseType;
         }
 
-        await _unitOfWork.ProcessPhaseTypes.AddAsync(processPhaseTypeToAdd);
+        await _unitOfWork.ProcessPhaseTypes.AddAsync(processPhaseTypeToAdd, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         var result = _mapper.Map<ProcessPhaseType, ProcessPhaseTypeResult>(processPhaseTypeToAdd);
@@ -107,6 +107,30 @@ public class ProcessPhaseTypeService : IProcessPhaseTypeService
             throw new NotFoundException(nameof(ProcessPhaseType), nameof(id));
         
         _unitOfWork.ProcessPhaseTypes.Delete(processPhaseTypeToDelete);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task AddParameterAsync(AddParameterToPhaseRequest request, CancellationToken cancellationToken = default)
+    {
+        var processPhaseType = await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.ProcessPhaseTypeId, cancellationToken);
+        
+        if (processPhaseType == null)
+            throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.ProcessPhaseTypeId));
+        
+        var processParameter = await _unitOfWork.ProcessParameters.GetByIdAsync(request.ProcessParameterId, cancellationToken);
+        
+        if (processParameter == null)
+            throw new NotFoundException(nameof(ProcessParameter), nameof(request.ProcessParameterId));
+
+        var processPhaseParameterToAdd = new ProcessPhaseParameter()
+        {
+            ParameterId = request.ProcessParameterId,
+            Parameter = processParameter,
+            PhaseTypeId = request.ProcessPhaseTypeId,
+            PhaseType = processPhaseType,
+        };
+
+        await _unitOfWork.ProcessPhaseParameters.AddAsync(processPhaseParameterToAdd, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

@@ -26,7 +26,7 @@ public interface IRepository<TEntity> where TEntity : BaseEntity
     Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate, CancellationToken cancellationToken = default);
     Task<TEntity?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
     Task<TResult?> GetByIdAsync<TResult>(string id, CancellationToken cancellationToken = default) where TResult : BaseResult;
-    Task AddAsync(TEntity entity);
+    Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
     void Update(TEntity entity);
     void Delete(TEntity entity);
 }

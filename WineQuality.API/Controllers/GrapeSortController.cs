@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WineQuality.Application.Interfaces.Services;
+using WineQuality.Application.Models.Dtos.Files;
 using WineQuality.Application.Models.Requests.GrapeSorts;
 
 namespace WineQuality.API.Controllers;
@@ -61,5 +62,27 @@ public class GrapeSortController : ControllerBase
     {
         await _grapeSortService.DeleteAsync(id);
         return NoContent();
+    }
+
+    [HttpPost("add_phase_forecast_model_datasets")]
+    public async Task<IActionResult> AddPhaseForecastModelDatasets([FromForm] AddGrapeSortPhaseForecastModelDatasetsRequest request)
+    {
+        if (!Request.Form.Files.Any())
+            return BadRequest();
+        
+        var filesDtos = new List<FileDto>();
+
+        foreach (var formFile in Request.Form.Files)
+        {
+            filesDtos.Add(new FileDto()
+            {
+                Content = formFile.OpenReadStream(),
+                Name = formFile.FileName,
+                ContentType = formFile.ContentType
+            });
+        }
+            
+        var result = await _grapeSortService.AddPhaseForecastModelDatasetsAsync(request, filesDtos);
+        return Ok(result);
     }
 }

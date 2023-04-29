@@ -4,6 +4,7 @@ namespace WineQuality.Domain.Entities;
 
 public class GrapeSortPhaseForecastModel : BaseEntity
 {
+    public decimal? Accuracy { get; set; }
     public string PhaseTypeId { get; set; } = null!;
     public virtual ProcessPhaseType PhaseType { get; set; } = null!;
     public string GrapeSortId { get; set; } = null!;

@@ -85,4 +85,12 @@ public class GrapeSortController : ControllerBase
         var result = await _grapeSortService.AddPhaseForecastModelDatasetsAsync(request, filesDtos);
         return Ok(result);
     }
+
+    [HttpPost("train_phase_model")]
+    public async Task<IActionResult> TrainPhaseModel([FromBody] TrainPhaseModelRequest request)
+    {
+        var result = await _grapeSortService.TrainModelByDatasetIdAsync(request);
+
+        return Ok(result);
+    }
 }

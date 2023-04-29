@@ -8,7 +8,7 @@ namespace WineQuality.API;
 public static class ApiLayerServicesRegistration
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services,
-        ConfigurationManager configuration)
+        IConfiguration configuration)
     {
         services.AddCors(o =>
             o.AddPolicy("AllowAll", b => b
@@ -28,7 +28,7 @@ public static class ApiLayerServicesRegistration
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Volunteer Corner API", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wine quality API", Version = "v1" });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,

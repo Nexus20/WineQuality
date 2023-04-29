@@ -20,14 +20,9 @@ public class ModelTrainingService : IModelTrainingService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<TrainModelResult> TrainPhaseModelAsync(string datasetId, CancellationToken cancellationToken = default)
+    public async Task<TrainModelResult> TrainPhaseModelAsync(GrapeSortPhaseDataset dataset, CancellationToken cancellationToken = default)
     {
-        var dataset = await _unitOfWork.GrapeSortPhaseDatasets.GetByIdAsync(datasetId, cancellationToken);
-
-        if (dataset == null)
-            throw new NotFoundException(nameof(GrapeSortPhaseDataset), nameof(datasetId));
-
-        var request = new TrainModelRequest()
+        var request = new MlServiceTrainModelRequest()
         {
             DatasetUri = dataset.DatasetFileReference.Uri
         };

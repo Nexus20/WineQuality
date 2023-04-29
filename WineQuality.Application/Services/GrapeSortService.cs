@@ -16,12 +16,14 @@ public class GrapeSortService : IGrapeSortService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IModelTrainingService _modelTrainingService;
 
-    public GrapeSortService(IUnitOfWork unitOfWork, IMapper mapper, IFileStorageService fileStorageService)
+    public GrapeSortService(IUnitOfWork unitOfWork, IMapper mapper, IFileStorageService fileStorageService, IModelTrainingService modelTrainingService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _fileStorageService = fileStorageService;
+        _modelTrainingService = modelTrainingService;
     }
 
     public async Task<GrapeSortResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
@@ -130,7 +132,7 @@ public class GrapeSortService : IGrapeSortService
                 await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.ProcessPhaseTypeId, cancellationToken);
         
             if(processPhaseType == null)
-                throw new NotFoundException(nameof(processPhaseType), nameof(request.ProcessPhaseTypeId));
+                throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.ProcessPhaseTypeId));
 
             grapeSortPhaseForecastModel = new GrapeSortPhaseForecastModel()
             {
@@ -166,6 +168,29 @@ public class GrapeSortService : IGrapeSortService
         var result = _mapper.Map<List<GrapeSortPhaseDataset>, List<GrapeSortPhaseDatasetResult>>(datasetsToAdd);
 
         return result;
+    }
+
+    public async Task<TrainModelResult> TrainModelByDatasetIdAsync(TrainPhaseModelRequest request, CancellationToken cancellationToken = default)
+    {
+        var dataset = await _unitOfWork.GrapeSortPhaseDatasets.GetByIdAsync(request.DatasetId, cancellationToken);
+        
+        if(dataset == null)
+            throw new NotFoundException(nameof(GrapeSortPhaseDataset), nameof(request.DatasetId));
+
+        var trainResult =
+            await _modelTrainingService.TrainPhaseModelAsync(dataset, cancellationToken: cancellationToken);
+
+        var model = dataset.GrapeSortPhaseForecastModel;
+        model.ForecastingModelFileReference = new FileReference()
+        {
+            Uri = trainResult.ModelUri
+        };
+        model.Accuracy = trainResult.Accuracy;
+        
+        _unitOfWork.GrapeSortPhaseForecastModels.Update(model);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return trainResult;
     }
 
     private Expression<Func<GrapeSort, bool>>? CreateFilterPredicate(GetGrapeSortsRequest request)

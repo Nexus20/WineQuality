@@ -11,4 +11,5 @@ public interface IGrapeSortService {
     Task<GrapeSortResult> UpdateAsync(UpdateGrapeSortRequest request, CancellationToken cancellationToken = default);
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
     Task<List<GrapeSortPhaseDatasetResult>> AddPhaseForecastModelDatasetsAsync(AddGrapeSortPhaseForecastModelDatasetsRequest request, List<FileDto> filesDtos, CancellationToken cancellationToken = default);
+    Task<TrainModelResult> TrainModelByDatasetIdAsync(TrainPhaseModelRequest request, CancellationToken cancellationToken = default);
 }

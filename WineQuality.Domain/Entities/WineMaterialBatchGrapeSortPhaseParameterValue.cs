@@ -2,10 +2,10 @@
 
 namespace WineQuality.Domain.Entities;
 
-public class WineMaterialBatchProcessParameterValue : BaseEntity
+public class WineMaterialBatchGrapeSortPhaseParameterValue : BaseEntity
 {
     public double Value { get; set; }
     
     public string PhaseParameterId { get; set; } = null!;
-    public virtual WineMaterialBatchProcessPhaseParameter PhaseParameter { get; set; } = null!;
+    public virtual WineMaterialBatchGrapeSortPhaseParameter PhaseParameter { get; set; } = null!;
 }

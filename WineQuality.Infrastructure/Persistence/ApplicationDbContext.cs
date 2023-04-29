@@ -12,14 +12,15 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, string, 
     IdentityUserLogin<string>, IdentityRoleClaim<string>, IdentityUserToken<string>>
 {
     public DbSet<GrapeSort> GrapeSorts { get; set; }
+    public DbSet<GrapeSortPhase> GrapeSortPhases { get; set; }
     public DbSet<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; set; }
     public DbSet<ProcessParameter> ProcessParameters { get; set; }
-    public DbSet<ProcessPhaseType> ProcessPhaseTypes { get; set; }
+    public DbSet<ProcessPhase> ProcessPhases { get; set; }
     public DbSet<ProcessPhaseParameter> ProcessPhaseParameters { get; set; }
     public DbSet<WineMaterialBatch> WineMaterialBatches { get; set; }
-    public DbSet<WineMaterialBatchProcessPhase> WineMaterialBatchProcessPhases { get; set; }
-    public DbSet<WineMaterialBatchProcessPhaseParameter> WineMaterialBatchProcessPhaseParameters { get; set; }
-    public DbSet<WineMaterialBatchProcessParameterValue> WineMaterialBatchProcessParameterValues { get; set; }
+    public DbSet<WineMaterialBatchGrapeSortPhase> WineMaterialBatchGrapeSortPhases { get; set; }
+    public DbSet<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchGrapeSortPhaseParameters { get; set; }
+    public DbSet<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchGrapeSortPhaseParameterValues { get; set; }
     public DbSet<FileReference> FileReferences { get; set; }
     public DbSet<Localization> Localizations { get; set; }
     public DbSet<Culture> Cultures { get; set; }

@@ -9,113 +9,98 @@ using WineQuality.Domain.Entities;
 
 namespace WineQuality.Application.Services;
 
-public class ProcessPhaseTypeService : IProcessPhaseTypeService
+public class ProcessPhaseService : IProcessPhaseService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public ProcessPhaseTypeService(IUnitOfWork unitOfWork, IMapper mapper)
+    public ProcessPhaseService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    public async Task<ProcessPhaseTypeResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<ProcessPhaseResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        var source = await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(id, cancellationToken);
+        var source = await _unitOfWork.ProcessPhases.GetByIdAsync(id, cancellationToken);
 
         if (source == null)
-            throw new NotFoundException(nameof(ProcessPhaseType), nameof(id));
+            throw new NotFoundException(nameof(ProcessPhase), nameof(id));
 
-        var result = _mapper.Map<ProcessPhaseType, ProcessPhaseTypeResult>(source);
+        var result = _mapper.Map<ProcessPhase, ProcessPhaseResult>(source);
 
         return result;
     }
 
-    public async Task<List<ProcessPhaseTypeResult>> GetAsync(GetProcessPhaseTypesRequest request, CancellationToken cancellationToken = default)
+    public async Task<List<ProcessPhaseResult>> GetAsync(GetProcessPhasesRequest request, CancellationToken cancellationToken = default)
     {
         var predicate = CreateFilterPredicate(request);
         
-        var source = await _unitOfWork.ProcessPhaseTypes.GetAsync(predicate, cancellationToken);
+        var source = await _unitOfWork.ProcessPhases.GetAsync(predicate, cancellationToken);
 
         if (source == null || !source.Any())
-            return new List<ProcessPhaseTypeResult>();
+            return new List<ProcessPhaseResult>();
 
-        var result = _mapper.Map<List<ProcessPhaseType>, List<ProcessPhaseTypeResult>>(source);
+        var result = _mapper.Map<List<ProcessPhase>, List<ProcessPhaseResult>>(source);
 
+        // TODO: Move order by into querying data
+        return result.OrderBy(x => x.Order).ToList();
+    }
+
+    public async Task<ProcessPhaseResult> CreateAsync(CreateProcessPhaseRequest request, CancellationToken cancellationToken = default)
+    {
+        var duplicateExists = await _unitOfWork.ProcessPhases.ExistsAsync(x => x.Name == request.Name, cancellationToken);
+
+        if (duplicateExists)
+            throw new ValidationException($"{nameof(ProcessPhase)} with such name {request.Name} already exists");
+        
+        var processPhaseToAdd = _mapper.Map<CreateProcessPhaseRequest, ProcessPhase>(request);
+
+        await _unitOfWork.ProcessPhases.AddAsync(processPhaseToAdd, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        var result = _mapper.Map<ProcessPhase, ProcessPhaseResult>(processPhaseToAdd);
         return result;
     }
 
-    public async Task<ProcessPhaseTypeResult> CreateAsync(CreateProcessPhaseTypeRequest request, CancellationToken cancellationToken = default)
+    public async Task<ProcessPhaseResult> UpdateAsync(UpdateProcessPhaseRequest request, CancellationToken cancellationToken = default)
     {
-        var duplicateExists = await _unitOfWork.ProcessPhaseTypes.ExistsAsync(x => x.Name == request.Name, cancellationToken);
+        var processPhaseToUpdate = await _unitOfWork.ProcessPhases.GetByIdAsync(request.Id, cancellationToken);
+        
+        if (processPhaseToUpdate == null)
+            throw new NotFoundException(nameof(ProcessPhase), nameof(request.Id));
+        
+        var duplicateExists = await _unitOfWork.ProcessPhases.ExistsAsync(x => x.Name == request.Name && x.Id != request.Id, cancellationToken);
 
         if (duplicateExists)
-            throw new ValidationException($"{nameof(ProcessPhaseType)} with such name {request.Name} already exists");
-        
-        var processPhaseTypeToAdd = _mapper.Map<CreateProcessPhaseTypeRequest, ProcessPhaseType>(request);
+            throw new ValidationException($"{nameof(ProcessPhase)} with such name {request.Name} already exists");
 
-        if (!string.IsNullOrWhiteSpace(request.PreviousPhaseId))
-        {
-            var previousPhaseType =
-                await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.PreviousPhaseId, cancellationToken);
-            
-            if(previousPhaseType == null)
-                throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.PreviousPhaseId));
+        _mapper.Map(request, processPhaseToUpdate);
 
-            var phaseWithSamePreviousPhase = await _unitOfWork.ProcessPhaseTypes.FirstOrDefaultAsync(x => x.PreviousPhase != null && x.PreviousPhase.Id == request.PreviousPhaseId, cancellationToken: cancellationToken);
-
-            if (phaseWithSamePreviousPhase != null)
-                throw new ValidationException($"Can't add previous phase type \"{previousPhaseType.Name}\" to phase \"{processPhaseTypeToAdd.Name}\" because phase \"{phaseWithSamePreviousPhase.Name} already has such phase as previous\"");
-
-            processPhaseTypeToAdd.PreviousPhase = previousPhaseType;
-        }
-
-        await _unitOfWork.ProcessPhaseTypes.AddAsync(processPhaseTypeToAdd, cancellationToken);
+        _unitOfWork.ProcessPhases.Update(processPhaseToUpdate);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        var result = _mapper.Map<ProcessPhaseType, ProcessPhaseTypeResult>(processPhaseTypeToAdd);
-        return result;
-    }
-
-    public async Task<ProcessPhaseTypeResult> UpdateAsync(UpdateProcessPhaseTypeRequest request, CancellationToken cancellationToken = default)
-    {
-        var processPhaseTypeToUpdate = await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.Id, cancellationToken);
-        
-        if (processPhaseTypeToUpdate == null)
-            throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.Id));
-        
-        var duplicateExists = await _unitOfWork.ProcessPhaseTypes.ExistsAsync(x => x.Name == request.Name && x.Id != request.Id, cancellationToken);
-
-        if (duplicateExists)
-            throw new ValidationException($"{nameof(ProcessPhaseType)} with such name {request.Name} already exists");
-
-        _mapper.Map(request, processPhaseTypeToUpdate);
-
-        _unitOfWork.ProcessPhaseTypes.Update(processPhaseTypeToUpdate);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        var result = _mapper.Map<ProcessPhaseType, ProcessPhaseTypeResult>(processPhaseTypeToUpdate);
+        var result = _mapper.Map<ProcessPhase, ProcessPhaseResult>(processPhaseToUpdate);
         return result;
     }
 
     public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
-        var processPhaseTypeToDelete = await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(id, cancellationToken);
+        var processPhaseToDelete = await _unitOfWork.ProcessPhases.GetByIdAsync(id, cancellationToken);
         
-        if (processPhaseTypeToDelete == null)
-            throw new NotFoundException(nameof(ProcessPhaseType), nameof(id));
+        if (processPhaseToDelete == null)
+            throw new NotFoundException(nameof(ProcessPhase), nameof(id));
         
-        _unitOfWork.ProcessPhaseTypes.Delete(processPhaseTypeToDelete);
+        _unitOfWork.ProcessPhases.Delete(processPhaseToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     public async Task AddParameterAsync(AddParameterToPhaseRequest request, CancellationToken cancellationToken = default)
     {
-        var processPhaseType = await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.ProcessPhaseTypeId, cancellationToken);
+        var processPhase = await _unitOfWork.ProcessPhases.GetByIdAsync(request.ProcessPhaseId, cancellationToken);
         
-        if (processPhaseType == null)
-            throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.ProcessPhaseTypeId));
+        if (processPhase == null)
+            throw new NotFoundException(nameof(ProcessPhase), nameof(request.ProcessPhaseId));
         
         var processParameter = await _unitOfWork.ProcessParameters.GetByIdAsync(request.ProcessParameterId, cancellationToken);
         
@@ -126,17 +111,17 @@ public class ProcessPhaseTypeService : IProcessPhaseTypeService
         {
             ParameterId = request.ProcessParameterId,
             Parameter = processParameter,
-            PhaseTypeId = request.ProcessPhaseTypeId,
-            PhaseType = processPhaseType,
+            PhaseId = request.ProcessPhaseId,
+            Phase = processPhase,
         };
 
         await _unitOfWork.ProcessPhaseParameters.AddAsync(processPhaseParameterToAdd, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    private Expression<Func<ProcessPhaseType, bool>>? CreateFilterPredicate(GetProcessPhaseTypesRequest request)
+    private Expression<Func<ProcessPhase, bool>>? CreateFilterPredicate(GetProcessPhasesRequest request)
     {
-        Expression<Func<ProcessPhaseType, bool>>? predicate = null;
+        Expression<Func<ProcessPhase, bool>>? predicate = null;
 
         // TODO: Add some code
         

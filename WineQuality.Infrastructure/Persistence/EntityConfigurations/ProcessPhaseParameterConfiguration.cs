@@ -8,6 +8,11 @@ internal class ProcessPhaseParameterConfiguration : IEntityTypeConfiguration<Pro
 {
     public void Configure(EntityTypeBuilder<ProcessPhaseParameter> builder)
     {
-        builder.HasIndex(x => new { x.ParameterId, x.PhaseTypeId }).IsUnique();
+        builder.HasIndex(x => new { x.ParameterId, x.PhaseId }).IsUnique();
+        
+        builder.HasMany(x => x.GrapeSortProcessPhaseParameterStandards)
+            .WithOne(x => x.PhaseParameter)
+            .HasForeignKey(x => x.PhaseParameterId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -8,6 +8,6 @@ public class WineMaterialBatchProcessPhaseResult : BaseResult
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public bool IsActive { get; set; }
-    public ProcessPhaseTypeResult PhaseType { get; set; } = null!;
+    public ProcessPhaseResult Phase { get; set; } = null!;
     // public virtual List<WineMaterialBatchProcessPhaseParameter>? Parameters { get; set; }
 }

@@ -13,7 +13,7 @@ internal class GrapeSortConfiguration : IEntityTypeConfiguration<GrapeSort>
             .HasForeignKey(x => x.GrapeSortId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(x => x.GrapeSortPhaseForecastModels)
+        builder.HasMany(x => x.Phases)
             .WithOne(x => x.GrapeSort)
             .HasForeignKey(x => x.GrapeSortId)
             .OnDelete(DeleteBehavior.Restrict);

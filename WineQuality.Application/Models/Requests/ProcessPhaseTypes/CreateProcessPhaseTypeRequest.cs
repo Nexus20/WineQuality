@@ -2,8 +2,7 @@
 
 namespace WineQuality.Application.Models.Requests.ProcessPhaseTypes;
 
-public class CreateProcessPhaseTypeRequest
+public class CreateProcessPhaseRequest
 {
     [Required] public string Name { get; set; } = null!;
-    public string? PreviousPhaseId { get; set; }
 }

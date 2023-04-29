@@ -13,6 +13,6 @@ public class ProcessParameterProfile : Profile
         CreateMap<UpdateProcessParameterRequest, ProcessParameter>();
         CreateMap<ProcessParameter, ProcessParameterResult>()
             .ForMember(d => d.Phases,
-                o => o.MapFrom(s => (s.Phases ?? new List<ProcessPhaseParameter>()).Select(p => p.PhaseType)));
+                o => o.MapFrom(s => (s.Phases ?? new List<ProcessPhaseParameter>()).Select(p => p.Phase))).MaxDepth(2);
     }
 }

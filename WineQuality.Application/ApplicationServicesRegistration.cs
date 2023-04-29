@@ -15,7 +15,7 @@ public static class ApplicationServicesRegistration
         // services.AddSingleton<HeartRateTimerManager>();
         
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        services.AddScoped<IProcessPhaseTypeService, ProcessPhaseTypeService>();
+        services.AddScoped<IProcessPhaseService, ProcessPhaseService>();
         services.AddScoped<IProcessParameterService, ProcessParameterService>();
         services.AddScoped<IGrapeSortService, GrapeSortService>();
         services.AddScoped<IWineMaterialBatchService, WineMaterialBatchService>();

@@ -12,8 +12,8 @@ using WineQuality.Infrastructure.Persistence;
 namespace WineQuality.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230429173711_AddedModelAccuracy")]
-    partial class AddedModelAccuracy
+    [Migration("20230429214904_HugeFix")]
+    partial class HugeFix
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -182,6 +182,50 @@ namespace WineQuality.Infrastructure.Migrations
                     b.ToTable("GrapeSorts");
                 });
 
+            modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortPhase", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GrapeSortId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PhaseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("PreviousPhaseId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrapeSortId");
+
+                    b.HasIndex("Order")
+                        .IsUnique();
+
+                    b.HasIndex("PhaseId");
+
+                    b.HasIndex("PreviousPhaseId")
+                        .IsUnique()
+                        .HasFilter("[PreviousPhaseId] IS NOT NULL");
+
+                    b.ToTable("GrapeSortPhases");
+                });
+
             modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortPhaseDataset", b =>
                 {
                     b.Property<string>("Id")
@@ -194,7 +238,7 @@ namespace WineQuality.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("GrapeSortPhaseForecastModelId")
+                    b.Property<string>("GrapeSortPhaseId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -209,7 +253,8 @@ namespace WineQuality.Infrastructure.Migrations
 
                     b.HasIndex("DatasetFileReferenceId");
 
-                    b.HasIndex("GrapeSortPhaseForecastModelId");
+                    b.HasIndex("GrapeSortPhaseId", "DatasetFileReferenceId")
+                        .IsUnique();
 
                     b.ToTable("GrapeSortPhaseDatasets");
                 });
@@ -228,11 +273,7 @@ namespace WineQuality.Infrastructure.Migrations
                     b.Property<string>("ForecastingModelFileReferenceId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("GrapeSortId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("PhaseTypeId")
+                    b.Property<string>("GrapeSortPhaseId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -243,11 +284,45 @@ namespace WineQuality.Infrastructure.Migrations
 
                     b.HasIndex("ForecastingModelFileReferenceId");
 
-                    b.HasIndex("GrapeSortId");
-
-                    b.HasIndex("PhaseTypeId");
+                    b.HasIndex("GrapeSortPhaseId", "ForecastingModelFileReferenceId")
+                        .IsUnique()
+                        .HasFilter("[ForecastingModelFileReferenceId] IS NOT NULL");
 
                     b.ToTable("GrapeSortPhaseForecastModels");
+                });
+
+            modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortProcessPhaseParameterStandard", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GrapeSortPhaseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<double?>("LowerBound")
+                        .HasColumnType("float");
+
+                    b.Property<string>("PhaseParameterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double?>("UpperBound")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrapeSortPhaseId");
+
+                    b.HasIndex("PhaseParameterId");
+
+                    b.ToTable("GrapeSortProcessPhaseParameterStandard");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.Localization", b =>
@@ -269,7 +344,7 @@ namespace WineQuality.Infrastructure.Migrations
                     b.Property<string>("ProcessParameterId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProcessPhaseTypeId")
+                    b.Property<string>("ProcessPhaseId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -281,7 +356,7 @@ namespace WineQuality.Infrastructure.Migrations
 
                     b.HasIndex("ProcessParameterId");
 
-                    b.HasIndex("ProcessPhaseTypeId");
+                    b.HasIndex("ProcessPhaseId");
 
                     b.ToTable("Localizations");
                 });
@@ -306,6 +381,26 @@ namespace WineQuality.Infrastructure.Migrations
                     b.ToTable("ProcessParameters");
                 });
 
+            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhase", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProcessPhases");
+                });
+
             modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseParameter", b =>
                 {
                     b.Property<string>("Id")
@@ -318,7 +413,7 @@ namespace WineQuality.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("PhaseTypeId")
+                    b.Property<string>("PhaseId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -327,38 +422,12 @@ namespace WineQuality.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParameterId");
+                    b.HasIndex("PhaseId");
 
-                    b.HasIndex("PhaseTypeId");
+                    b.HasIndex("ParameterId", "PhaseId")
+                        .IsUnique();
 
                     b.ToTable("ProcessPhaseParameters");
-                });
-
-            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseType", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PreviousPhaseId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PreviousPhaseId")
-                        .IsUnique()
-                        .HasFilter("[PreviousPhaseId] IS NOT NULL");
-
-                    b.ToTable("ProcessPhaseTypes");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatch", b =>
@@ -394,7 +463,73 @@ namespace WineQuality.Infrastructure.Migrations
                     b.ToTable("WineMaterialBatches");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessParameterValue", b =>
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhase", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GrapeSortPhaseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("WineMaterialBatchId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrapeSortPhaseId");
+
+                    b.HasIndex("WineMaterialBatchId", "GrapeSortPhaseId")
+                        .IsUnique();
+
+                    b.ToTable("WineMaterialBatchProcessPhases");
+                });
+
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameter", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhaseParameterId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("WineMaterialBatchGrapeSortPhaseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhaseParameterId");
+
+                    b.HasIndex("WineMaterialBatchGrapeSortPhaseId");
+
+                    b.ToTable("WineMaterialBatchProcessPhaseParameters");
+                });
+
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameterValue", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -417,77 +552,6 @@ namespace WineQuality.Infrastructure.Migrations
                     b.HasIndex("PhaseParameterId");
 
                     b.ToTable("WineMaterialBatchProcessParameterValues");
-                });
-
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessPhase", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PhaseTypeId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("WineMaterialBatchId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PhaseTypeId");
-
-                    b.HasIndex("WineMaterialBatchId");
-
-                    b.ToTable("WineMaterialBatchProcessPhases");
-                });
-
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessPhaseParameter", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double?>("LowerBound")
-                        .HasColumnType("float");
-
-                    b.Property<string>("PhaseParameterId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double?>("UpperBound")
-                        .HasColumnType("float");
-
-                    b.Property<string>("WineMaterialBatchId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PhaseParameterId");
-
-                    b.HasIndex("WineMaterialBatchId");
-
-                    b.ToTable("WineMaterialBatchProcessPhaseParameters");
                 });
 
             modelBuilder.Entity("WineQuality.Infrastructure.Identity.AppRole", b =>
@@ -659,6 +723,32 @@ namespace WineQuality.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortPhase", b =>
+                {
+                    b.HasOne("WineQuality.Domain.Entities.GrapeSort", "GrapeSort")
+                        .WithMany("Phases")
+                        .HasForeignKey("GrapeSortId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WineQuality.Domain.Entities.ProcessPhase", "Phase")
+                        .WithMany("GrapeSorts")
+                        .HasForeignKey("PhaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WineQuality.Domain.Entities.GrapeSortPhase", "PreviousPhase")
+                        .WithOne("NextPhase")
+                        .HasForeignKey("WineQuality.Domain.Entities.GrapeSortPhase", "PreviousPhaseId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("GrapeSort");
+
+                    b.Navigation("Phase");
+
+                    b.Navigation("PreviousPhase");
+                });
+
             modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortPhaseDataset", b =>
                 {
                     b.HasOne("WineQuality.Domain.Entities.FileReference", "DatasetFileReference")
@@ -667,15 +757,15 @@ namespace WineQuality.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WineQuality.Domain.Entities.GrapeSortPhaseForecastModel", "GrapeSortPhaseForecastModel")
+                    b.HasOne("WineQuality.Domain.Entities.GrapeSortPhase", "GrapeSortPhase")
                         .WithMany("Datasets")
-                        .HasForeignKey("GrapeSortPhaseForecastModelId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("GrapeSortPhaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("DatasetFileReference");
 
-                    b.Navigation("GrapeSortPhaseForecastModel");
+                    b.Navigation("GrapeSortPhase");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortPhaseForecastModel", b =>
@@ -685,23 +775,34 @@ namespace WineQuality.Infrastructure.Migrations
                         .HasForeignKey("ForecastingModelFileReferenceId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("WineQuality.Domain.Entities.GrapeSort", "GrapeSort")
+                    b.HasOne("WineQuality.Domain.Entities.GrapeSortPhase", "GrapeSortPhase")
                         .WithMany("GrapeSortPhaseForecastModels")
-                        .HasForeignKey("GrapeSortId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("WineQuality.Domain.Entities.ProcessPhaseType", "PhaseType")
-                        .WithMany("GrapeSortPhaseForecastModels")
-                        .HasForeignKey("PhaseTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("GrapeSortPhaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ForecastingModelFileReference");
 
-                    b.Navigation("GrapeSort");
+                    b.Navigation("GrapeSortPhase");
+                });
 
-                    b.Navigation("PhaseType");
+            modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortProcessPhaseParameterStandard", b =>
+                {
+                    b.HasOne("WineQuality.Domain.Entities.GrapeSortPhase", "GrapeSortPhase")
+                        .WithMany("GrapeSortProcessPhaseParameterStandards")
+                        .HasForeignKey("GrapeSortPhaseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WineQuality.Domain.Entities.ProcessPhaseParameter", "PhaseParameter")
+                        .WithMany("GrapeSortProcessPhaseParameterStandards")
+                        .HasForeignKey("PhaseParameterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("GrapeSortPhase");
+
+                    b.Navigation("PhaseParameter");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.Localization", b =>
@@ -717,9 +818,9 @@ namespace WineQuality.Infrastructure.Migrations
                         .HasForeignKey("ProcessParameterId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("WineQuality.Domain.Entities.ProcessPhaseType", null)
+                    b.HasOne("WineQuality.Domain.Entities.ProcessPhase", null)
                         .WithMany("Localizations")
-                        .HasForeignKey("ProcessPhaseTypeId")
+                        .HasForeignKey("ProcessPhaseId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Culture");
@@ -733,25 +834,15 @@ namespace WineQuality.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WineQuality.Domain.Entities.ProcessPhaseType", "PhaseType")
+                    b.HasOne("WineQuality.Domain.Entities.ProcessPhase", "Phase")
                         .WithMany("Parameters")
-                        .HasForeignKey("PhaseTypeId")
+                        .HasForeignKey("PhaseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Parameter");
 
-                    b.Navigation("PhaseType");
-                });
-
-            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseType", b =>
-                {
-                    b.HasOne("WineQuality.Domain.Entities.ProcessPhaseType", "PreviousPhase")
-                        .WithOne("NextPhase")
-                        .HasForeignKey("WineQuality.Domain.Entities.ProcessPhaseType", "PreviousPhaseId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("PreviousPhase");
+                    b.Navigation("Phase");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatch", b =>
@@ -765,23 +856,12 @@ namespace WineQuality.Infrastructure.Migrations
                     b.Navigation("GrapeSort");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessParameterValue", b =>
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhase", b =>
                 {
-                    b.HasOne("WineQuality.Domain.Entities.WineMaterialBatchProcessPhaseParameter", "PhaseParameter")
-                        .WithMany("Values")
-                        .HasForeignKey("PhaseParameterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PhaseParameter");
-                });
-
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessPhase", b =>
-                {
-                    b.HasOne("WineQuality.Domain.Entities.ProcessPhaseType", "PhaseType")
+                    b.HasOne("WineQuality.Domain.Entities.GrapeSortPhase", "GrapeSortPhase")
                         .WithMany()
-                        .HasForeignKey("PhaseTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("GrapeSortPhaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("WineQuality.Domain.Entities.WineMaterialBatch", "WineMaterialBatch")
@@ -790,12 +870,12 @@ namespace WineQuality.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("PhaseType");
+                    b.Navigation("GrapeSortPhase");
 
                     b.Navigation("WineMaterialBatch");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessPhaseParameter", b =>
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameter", b =>
                 {
                     b.HasOne("WineQuality.Domain.Entities.ProcessPhaseParameter", "PhaseParameter")
                         .WithMany()
@@ -803,15 +883,26 @@ namespace WineQuality.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WineQuality.Domain.Entities.WineMaterialBatchProcessPhase", "WineMaterialBatch")
+                    b.HasOne("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhase", "WineMaterialBatchGrapeSortPhase")
                         .WithMany("Parameters")
-                        .HasForeignKey("WineMaterialBatchId")
+                        .HasForeignKey("WineMaterialBatchGrapeSortPhaseId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("PhaseParameter");
 
-                    b.Navigation("WineMaterialBatch");
+                    b.Navigation("WineMaterialBatchGrapeSortPhase");
+                });
+
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameterValue", b =>
+                {
+                    b.HasOne("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameter", "PhaseParameter")
+                        .WithMany("Values")
+                        .HasForeignKey("PhaseParameterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PhaseParameter");
                 });
 
             modelBuilder.Entity("WineQuality.Infrastructure.Identity.AppUserRole", b =>
@@ -847,14 +938,20 @@ namespace WineQuality.Infrastructure.Migrations
 
             modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSort", b =>
                 {
-                    b.Navigation("GrapeSortPhaseForecastModels");
+                    b.Navigation("Phases");
 
                     b.Navigation("WineMaterialBatches");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortPhaseForecastModel", b =>
+            modelBuilder.Entity("WineQuality.Domain.Entities.GrapeSortPhase", b =>
                 {
                     b.Navigation("Datasets");
+
+                    b.Navigation("GrapeSortPhaseForecastModels");
+
+                    b.Navigation("GrapeSortProcessPhaseParameterStandards");
+
+                    b.Navigation("NextPhase");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.ProcessParameter", b =>
@@ -864,15 +961,18 @@ namespace WineQuality.Infrastructure.Migrations
                     b.Navigation("Phases");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseType", b =>
+            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhase", b =>
                 {
-                    b.Navigation("GrapeSortPhaseForecastModels");
+                    b.Navigation("GrapeSorts");
 
                     b.Navigation("Localizations");
 
-                    b.Navigation("NextPhase");
-
                     b.Navigation("Parameters");
+                });
+
+            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseParameter", b =>
+                {
+                    b.Navigation("GrapeSortProcessPhaseParameterStandards");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatch", b =>
@@ -880,12 +980,12 @@ namespace WineQuality.Infrastructure.Migrations
                     b.Navigation("Phases");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessPhase", b =>
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhase", b =>
                 {
                     b.Navigation("Parameters");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchProcessPhaseParameter", b =>
+            modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameter", b =>
                 {
                     b.Navigation("Values");
                 });

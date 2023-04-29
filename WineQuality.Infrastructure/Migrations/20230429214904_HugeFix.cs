@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WineQuality.Infrastructure.Migrations
 {
-    public partial class Init : Migration
+    public partial class HugeFix : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,11 +32,11 @@ namespace WineQuality.Infrastructure.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -55,6 +55,49 @@ namespace WineQuality.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cultures",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CultureName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CultureCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cultures", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FileReferences",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Uri = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileReferences", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GrapeSorts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GrapeSorts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProcessParameters",
                 columns: table => new
                 {
@@ -69,40 +112,17 @@ namespace WineQuality.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProcessPhaseTypes",
+                name: "ProcessPhases",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PreviousPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProcessPhaseTypes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProcessPhaseTypes_ProcessPhaseTypes_PreviousPhaseId",
-                        column: x => x.PreviousPhaseId,
-                        principalTable: "ProcessPhaseTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WineMaterialBatches",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    HarvestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    HarvestLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WineMaterialBatches", x => x.Id);
+                    table.PrimaryKey("PK_ProcessPhases", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -214,11 +234,105 @@ namespace WineQuality.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WineMaterialBatches",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HarvestDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    HarvestLocation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GrapeSortId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WineMaterialBatches", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WineMaterialBatches_GrapeSorts_GrapeSortId",
+                        column: x => x.GrapeSortId,
+                        principalTable: "GrapeSorts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GrapeSortPhases",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PhaseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    GrapeSortId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    Order = table.Column<int>(type: "int", nullable: false),
+                    PreviousPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GrapeSortPhases", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortPhases_GrapeSortPhases_PreviousPhaseId",
+                        column: x => x.PreviousPhaseId,
+                        principalTable: "GrapeSortPhases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortPhases_GrapeSorts_GrapeSortId",
+                        column: x => x.GrapeSortId,
+                        principalTable: "GrapeSorts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortPhases_ProcessPhases_PhaseId",
+                        column: x => x.PhaseId,
+                        principalTable: "ProcessPhases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Localizations",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LocalName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CultureId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProcessParameterId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    ProcessPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Localizations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Localizations_Cultures_CultureId",
+                        column: x => x.CultureId,
+                        principalTable: "Cultures",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Localizations_ProcessParameters_ProcessParameterId",
+                        column: x => x.ProcessParameterId,
+                        principalTable: "ProcessParameters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Localizations_ProcessPhases_ProcessPhaseId",
+                        column: x => x.ProcessPhaseId,
+                        principalTable: "ProcessPhases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProcessPhaseParameters",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PhaseTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PhaseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ParameterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -233,11 +347,67 @@ namespace WineQuality.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ProcessPhaseParameters_ProcessPhaseTypes_PhaseTypeId",
-                        column: x => x.PhaseTypeId,
-                        principalTable: "ProcessPhaseTypes",
+                        name: "FK_ProcessPhaseParameters_ProcessPhases_PhaseId",
+                        column: x => x.PhaseId,
+                        principalTable: "ProcessPhases",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GrapeSortPhaseDatasets",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GrapeSortPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DatasetFileReferenceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GrapeSortPhaseDatasets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortPhaseDatasets_FileReferences_DatasetFileReferenceId",
+                        column: x => x.DatasetFileReferenceId,
+                        principalTable: "FileReferences",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortPhaseDatasets_GrapeSortPhases_GrapeSortPhaseId",
+                        column: x => x.GrapeSortPhaseId,
+                        principalTable: "GrapeSortPhases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GrapeSortPhaseForecastModels",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Accuracy = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    GrapeSortPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ForecastingModelFileReferenceId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GrapeSortPhaseForecastModels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortPhaseForecastModels_FileReferences_ForecastingModelFileReferenceId",
+                        column: x => x.ForecastingModelFileReferenceId,
+                        principalTable: "FileReferences",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortPhaseForecastModels_GrapeSortPhases_GrapeSortPhaseId",
+                        column: x => x.GrapeSortPhaseId,
+                        principalTable: "GrapeSortPhases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -249,7 +419,7 @@ namespace WineQuality.Infrastructure.Migrations
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     WineMaterialBatchId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    PhaseTypeId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    GrapeSortPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -257,11 +427,11 @@ namespace WineQuality.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_WineMaterialBatchProcessPhases", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WineMaterialBatchProcessPhases_ProcessPhaseTypes_PhaseTypeId",
-                        column: x => x.PhaseTypeId,
-                        principalTable: "ProcessPhaseTypes",
+                        name: "FK_WineMaterialBatchProcessPhases_GrapeSortPhases_GrapeSortPhaseId",
+                        column: x => x.GrapeSortPhaseId,
+                        principalTable: "GrapeSortPhases",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_WineMaterialBatchProcessPhases_WineMaterialBatches_WineMaterialBatchId",
                         column: x => x.WineMaterialBatchId,
@@ -271,14 +441,41 @@ namespace WineQuality.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WineMaterialBatchProcessPhaseParameters",
+                name: "GrapeSortProcessPhaseParameterStandard",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     LowerBound = table.Column<double>(type: "float", nullable: true),
                     UpperBound = table.Column<double>(type: "float", nullable: true),
+                    GrapeSortPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PhaseParameterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    WineMaterialBatchId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GrapeSortProcessPhaseParameterStandard", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortProcessPhaseParameterStandard_GrapeSortPhases_GrapeSortPhaseId",
+                        column: x => x.GrapeSortPhaseId,
+                        principalTable: "GrapeSortPhases",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GrapeSortProcessPhaseParameterStandard_ProcessPhaseParameters_PhaseParameterId",
+                        column: x => x.PhaseParameterId,
+                        principalTable: "ProcessPhaseParameters",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WineMaterialBatchProcessPhaseParameters",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PhaseParameterId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    WineMaterialBatchGrapeSortPhaseId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -292,8 +489,8 @@ namespace WineQuality.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WineMaterialBatchProcessPhaseParameters_WineMaterialBatchProcessPhases_WineMaterialBatchId",
-                        column: x => x.WineMaterialBatchId,
+                        name: "FK_WineMaterialBatchProcessPhaseParameters_WineMaterialBatchProcessPhases_WineMaterialBatchGrapeSortPhaseId",
+                        column: x => x.WineMaterialBatchGrapeSortPhaseId,
                         principalTable: "WineMaterialBatchProcessPhases",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -360,21 +557,97 @@ namespace WineQuality.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProcessPhaseParameters_ParameterId",
-                table: "ProcessPhaseParameters",
-                column: "ParameterId");
+                name: "IX_GrapeSortPhaseDatasets_DatasetFileReferenceId",
+                table: "GrapeSortPhaseDatasets",
+                column: "DatasetFileReferenceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProcessPhaseParameters_PhaseTypeId",
-                table: "ProcessPhaseParameters",
-                column: "PhaseTypeId");
+                name: "IX_GrapeSortPhaseDatasets_GrapeSortPhaseId_DatasetFileReferenceId",
+                table: "GrapeSortPhaseDatasets",
+                columns: new[] { "GrapeSortPhaseId", "DatasetFileReferenceId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProcessPhaseTypes_PreviousPhaseId",
-                table: "ProcessPhaseTypes",
+                name: "IX_GrapeSortPhaseForecastModels_ForecastingModelFileReferenceId",
+                table: "GrapeSortPhaseForecastModels",
+                column: "ForecastingModelFileReferenceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSortPhaseForecastModels_GrapeSortPhaseId_ForecastingModelFileReferenceId",
+                table: "GrapeSortPhaseForecastModels",
+                columns: new[] { "GrapeSortPhaseId", "ForecastingModelFileReferenceId" },
+                unique: true,
+                filter: "[ForecastingModelFileReferenceId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSortPhases_GrapeSortId",
+                table: "GrapeSortPhases",
+                column: "GrapeSortId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSortPhases_Order",
+                table: "GrapeSortPhases",
+                column: "Order",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSortPhases_PhaseId",
+                table: "GrapeSortPhases",
+                column: "PhaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSortPhases_PreviousPhaseId",
+                table: "GrapeSortPhases",
                 column: "PreviousPhaseId",
                 unique: true,
                 filter: "[PreviousPhaseId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSortProcessPhaseParameterStandard_GrapeSortPhaseId",
+                table: "GrapeSortProcessPhaseParameterStandard",
+                column: "GrapeSortPhaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSortProcessPhaseParameterStandard_PhaseParameterId",
+                table: "GrapeSortProcessPhaseParameterStandard",
+                column: "PhaseParameterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GrapeSorts_Name",
+                table: "GrapeSorts",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Localizations_CultureId",
+                table: "Localizations",
+                column: "CultureId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Localizations_ProcessParameterId",
+                table: "Localizations",
+                column: "ProcessParameterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Localizations_ProcessPhaseId",
+                table: "Localizations",
+                column: "ProcessPhaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProcessPhaseParameters_ParameterId_PhaseId",
+                table: "ProcessPhaseParameters",
+                columns: new[] { "ParameterId", "PhaseId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProcessPhaseParameters_PhaseId",
+                table: "ProcessPhaseParameters",
+                column: "PhaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WineMaterialBatches_GrapeSortId",
+                table: "WineMaterialBatches",
+                column: "GrapeSortId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WineMaterialBatchProcessParameterValues_PhaseParameterId",
@@ -387,19 +660,20 @@ namespace WineQuality.Infrastructure.Migrations
                 column: "PhaseParameterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WineMaterialBatchProcessPhaseParameters_WineMaterialBatchId",
+                name: "IX_WineMaterialBatchProcessPhaseParameters_WineMaterialBatchGrapeSortPhaseId",
                 table: "WineMaterialBatchProcessPhaseParameters",
-                column: "WineMaterialBatchId");
+                column: "WineMaterialBatchGrapeSortPhaseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WineMaterialBatchProcessPhases_PhaseTypeId",
+                name: "IX_WineMaterialBatchProcessPhases_GrapeSortPhaseId",
                 table: "WineMaterialBatchProcessPhases",
-                column: "PhaseTypeId");
+                column: "GrapeSortPhaseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WineMaterialBatchProcessPhases_WineMaterialBatchId",
+                name: "IX_WineMaterialBatchProcessPhases_WineMaterialBatchId_GrapeSortPhaseId",
                 table: "WineMaterialBatchProcessPhases",
-                column: "WineMaterialBatchId");
+                columns: new[] { "WineMaterialBatchId", "GrapeSortPhaseId" },
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -420,6 +694,18 @@ namespace WineQuality.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "GrapeSortPhaseDatasets");
+
+            migrationBuilder.DropTable(
+                name: "GrapeSortPhaseForecastModels");
+
+            migrationBuilder.DropTable(
+                name: "GrapeSortProcessPhaseParameterStandard");
+
+            migrationBuilder.DropTable(
+                name: "Localizations");
+
+            migrationBuilder.DropTable(
                 name: "WineMaterialBatchProcessParameterValues");
 
             migrationBuilder.DropTable(
@@ -427,6 +713,12 @@ namespace WineQuality.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "FileReferences");
+
+            migrationBuilder.DropTable(
+                name: "Cultures");
 
             migrationBuilder.DropTable(
                 name: "WineMaterialBatchProcessPhaseParameters");
@@ -441,10 +733,16 @@ namespace WineQuality.Infrastructure.Migrations
                 name: "ProcessParameters");
 
             migrationBuilder.DropTable(
-                name: "ProcessPhaseTypes");
+                name: "GrapeSortPhases");
 
             migrationBuilder.DropTable(
                 name: "WineMaterialBatches");
+
+            migrationBuilder.DropTable(
+                name: "ProcessPhases");
+
+            migrationBuilder.DropTable(
+                name: "GrapeSorts");
         }
     }
 }

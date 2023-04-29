@@ -9,64 +9,64 @@ namespace WineQuality.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class ProcessPhaseTypeController : ControllerBase
+public class ProcessPhaseController : ControllerBase
 {
-    private readonly IProcessPhaseTypeService _processPhaseTypeService;
+    private readonly IProcessPhaseService _processPhaseService;
     
-    // GET: api/ProcessPhaseType
-    public ProcessPhaseTypeController(IProcessPhaseTypeService processPhaseTypeService)
+    // GET: api/ProcessPhase
+    public ProcessPhaseController(IProcessPhaseService processPhaseService)
     {
-        _processPhaseTypeService = processPhaseTypeService;
+        _processPhaseService = processPhaseService;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery]GetProcessPhaseTypesRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Get([FromQuery]GetProcessPhasesRequest request, CancellationToken cancellationToken)
     {
-        var result = await _processPhaseTypeService.GetAsync(request, cancellationToken: cancellationToken);
+        var result = await _processPhaseService.GetAsync(request, cancellationToken: cancellationToken);
 
         return Ok(result);
     }
 
-    // GET: api/ProcessPhaseType/5
+    // GET: api/ProcessPhase/5
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
     {
-        var result = await _processPhaseTypeService.GetByIdAsync(id, cancellationToken: cancellationToken);
+        var result = await _processPhaseService.GetByIdAsync(id, cancellationToken: cancellationToken);
         
         return Ok(result);
     }
 
-    // POST: api/ProcessPhaseType
+    // POST: api/ProcessPhase
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] CreateProcessPhaseTypeRequest request)
+    public async Task<IActionResult> Post([FromBody] CreateProcessPhaseRequest request)
     {
-        var result = await _processPhaseTypeService.CreateAsync(request);
+        var result = await _processPhaseService.CreateAsync(request);
         return StatusCode(StatusCodes.Status201Created, result);
     }
 
-    // PUT: api/ProcessPhaseType/5
+    // PUT: api/ProcessPhase/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(string id, [FromBody] UpdateProcessPhaseTypeRequest request)
+    public async Task<IActionResult> Put(string id, [FromBody] UpdateProcessPhaseRequest request)
     {
         if (id != request.Id)
             return BadRequest();
         
-        var result = await _processPhaseTypeService.UpdateAsync(request);
+        var result = await _processPhaseService.UpdateAsync(request);
         return Ok(result);
     }
 
-    // DELETE: api/ProcessPhaseType/5
+    // DELETE: api/ProcessPhase/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        await _processPhaseTypeService.DeleteAsync(id);
+        await _processPhaseService.DeleteAsync(id);
         return NoContent();
     }
 
     [HttpPost("add_parameter")]
     public async Task<IActionResult> AddParameterToPhase([FromBody] AddParameterToPhaseRequest request)
     {
-        await _processPhaseTypeService.AddParameterAsync(request);
+        await _processPhaseService.AddParameterAsync(request);
         return Ok();
     }
 }

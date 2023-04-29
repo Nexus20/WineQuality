@@ -4,9 +4,9 @@ using WineQuality.Domain.Entities;
 
 namespace WineQuality.Infrastructure.Persistence.EntityConfigurations;
 
-internal class WineMaterialBatchProcessPhaseParameterConfiguration : IEntityTypeConfiguration<WineMaterialBatchProcessPhaseParameter>
+internal class WineMaterialBatchGrapeSortPhaseParameterConfiguration : IEntityTypeConfiguration<WineMaterialBatchGrapeSortPhaseParameter>
 {
-    public void Configure(EntityTypeBuilder<WineMaterialBatchProcessPhaseParameter> builder)
+    public void Configure(EntityTypeBuilder<WineMaterialBatchGrapeSortPhaseParameter> builder)
     {
         builder.HasMany(x => x.Values)
             .WithOne(x => x.PhaseParameter)

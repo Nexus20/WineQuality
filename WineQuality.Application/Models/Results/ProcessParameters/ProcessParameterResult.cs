@@ -6,5 +6,5 @@ namespace WineQuality.Application.Models.Results.ProcessParameters;
 public class ProcessParameterResult : BaseResult
 {
     public string Name { get; set; } = null!;
-    public virtual List<ProcessPhaseTypeResult>? Phases { get; set; }
+    public virtual List<ProcessPhaseResult>? Phases { get; set; }
 }

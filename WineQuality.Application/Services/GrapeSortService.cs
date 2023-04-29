@@ -103,94 +103,98 @@ public class GrapeSortService : IGrapeSortService
     public async Task<List<GrapeSortPhaseDatasetResult>> AddPhaseForecastModelDatasetsAsync(AddGrapeSortPhaseForecastModelDatasetsRequest request, List<FileDto> filesDtos,
         CancellationToken cancellationToken = default)
     {
-        if (filesDtos.Any(x => x.Content.Length == 0))
-        {
-            throw new ValidationException("Files cannot be empty");
-        }
-
-        var validTypes = new[] { "text/csv" };
-
-        if (filesDtos.Any(x => !validTypes.Contains(x.ContentType)))
-        {
-            throw new ValidationException("Invalid file types");
-        }
+        throw new NotImplementedException();
         
-        var fileNamesWithUrls = await _fileStorageService.UploadAsync(filesDtos);
-
-        var grapeSortPhaseForecastModel = await _unitOfWork.GrapeSortPhaseForecastModels.FirstOrDefaultAsync(
-            x => x.GrapeSortId == request.GrapeSortId && x.PhaseTypeId == request.ProcessPhaseTypeId,
-            cancellationToken: cancellationToken);
-
-        if (grapeSortPhaseForecastModel == null)
-        {
-            var grapeSort = await _unitOfWork.GrapeSorts.GetByIdAsync(request.GrapeSortId, cancellationToken);
-        
-            if (grapeSort == null)
-                throw new NotFoundException(nameof(GrapeSort), nameof(request.GrapeSortId));
-
-            var processPhaseType =
-                await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.ProcessPhaseTypeId, cancellationToken);
-        
-            if(processPhaseType == null)
-                throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.ProcessPhaseTypeId));
-
-            grapeSortPhaseForecastModel = new GrapeSortPhaseForecastModel()
-            {
-                GrapeSortId = request.GrapeSortId,
-                GrapeSort = grapeSort,
-                PhaseTypeId = request.ProcessPhaseTypeId,
-                PhaseType = processPhaseType,
-                Datasets = new List<GrapeSortPhaseDataset>()
-            };
-            
-            await _unitOfWork.GrapeSortPhaseForecastModels.AddAsync(grapeSortPhaseForecastModel, cancellationToken: cancellationToken);
-        }
-        else
-        {
-            _unitOfWork.GrapeSortPhaseForecastModels.Update(grapeSortPhaseForecastModel);
-        }
-
-        var datasetsToAdd = fileNamesWithUrls.Urls.Select(x => new GrapeSortPhaseDataset()
-        {
-            Name = x.Name,
-            DatasetFileReference = new FileReference()
-            {
-                Uri = x.Url
-            },
-            GrapeSortPhaseForecastModelId = grapeSortPhaseForecastModel.Id,
-            GrapeSortPhaseForecastModel = grapeSortPhaseForecastModel
-        }).ToList();
-
-        grapeSortPhaseForecastModel.Datasets = datasetsToAdd;
-
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        var result = _mapper.Map<List<GrapeSortPhaseDataset>, List<GrapeSortPhaseDatasetResult>>(datasetsToAdd);
-
-        return result;
+        // if (filesDtos.Any(x => x.Content.Length == 0))
+        // {
+        //     throw new ValidationException("Files cannot be empty");
+        // }
+        //
+        // var validTypes = new[] { "text/csv" };
+        //
+        // if (filesDtos.Any(x => !validTypes.Contains(x.ContentType)))
+        // {
+        //     throw new ValidationException("Invalid file types");
+        // }
+        //
+        // var fileNamesWithUrls = await _fileStorageService.UploadAsync(filesDtos);
+        //
+        // var grapeSortPhaseForecastModel = await _unitOfWork.GrapeSortPhaseForecastModels.FirstOrDefaultAsync(
+        //     x => x.GrapeSortId == request.GrapeSortId && x.PhaseId == request.ProcessPhaseId,
+        //     cancellationToken: cancellationToken);
+        //
+        // if (grapeSortPhaseForecastModel == null)
+        // {
+        //     var grapeSort = await _unitOfWork.GrapeSorts.GetByIdAsync(request.GrapeSortId, cancellationToken);
+        //
+        //     if (grapeSort == null)
+        //         throw new NotFoundException(nameof(GrapeSort), nameof(request.GrapeSortId));
+        //
+        //     var processPhase =
+        //         await _unitOfWork.ProcessPhases.GetByIdAsync(request.ProcessPhaseId, cancellationToken);
+        //
+        //     if(processPhase == null)
+        //         throw new NotFoundException(nameof(ProcessPhase), nameof(request.ProcessPhaseId));
+        //
+        //     grapeSortPhaseForecastModel = new GrapeSortPhaseForecastModel()
+        //     {
+        //         GrapeSortId = request.GrapeSortId,
+        //         GrapeSort = grapeSort,
+        //         PhaseId = request.ProcessPhaseId,
+        //         Phase = processPhase,
+        //         Datasets = new List<GrapeSortPhaseDataset>()
+        //     };
+        //     
+        //     await _unitOfWork.GrapeSortPhaseForecastModels.AddAsync(grapeSortPhaseForecastModel, cancellationToken: cancellationToken);
+        // }
+        // else
+        // {
+        //     _unitOfWork.GrapeSortPhaseForecastModels.Update(grapeSortPhaseForecastModel);
+        // }
+        //
+        // var datasetsToAdd = fileNamesWithUrls.Urls.Select(x => new GrapeSortPhaseDataset()
+        // {
+        //     Name = x.Name,
+        //     DatasetFileReference = new FileReference()
+        //     {
+        //         Uri = x.Url
+        //     },
+        //     GrapeSortPhaseForecastModelId = grapeSortPhaseForecastModel.Id,
+        //     GrapeSortPhaseForecastModel = grapeSortPhaseForecastModel
+        // }).ToList();
+        //
+        // grapeSortPhaseForecastModel.Datasets = datasetsToAdd;
+        //
+        // await _unitOfWork.SaveChangesAsync(cancellationToken);
+        //
+        // var result = _mapper.Map<List<GrapeSortPhaseDataset>, List<GrapeSortPhaseDatasetResult>>(datasetsToAdd);
+        //
+        // return result;
     }
 
     public async Task<TrainModelResult> TrainModelByDatasetIdAsync(TrainPhaseModelRequest request, CancellationToken cancellationToken = default)
     {
-        var dataset = await _unitOfWork.GrapeSortPhaseDatasets.GetByIdAsync(request.DatasetId, cancellationToken);
+        throw new NotImplementedException();
         
-        if(dataset == null)
-            throw new NotFoundException(nameof(GrapeSortPhaseDataset), nameof(request.DatasetId));
-
-        var trainResult =
-            await _modelTrainingService.TrainPhaseModelAsync(dataset, cancellationToken: cancellationToken);
-
-        var model = dataset.GrapeSortPhaseForecastModel;
-        model.ForecastingModelFileReference = new FileReference()
-        {
-            Uri = trainResult.ModelUri
-        };
-        model.Accuracy = trainResult.Accuracy;
-        
-        _unitOfWork.GrapeSortPhaseForecastModels.Update(model);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return trainResult;
+        // var dataset = await _unitOfWork.GrapeSortPhaseDatasets.GetByIdAsync(request.DatasetId, cancellationToken);
+        //
+        // if(dataset == null)
+        //     throw new NotFoundException(nameof(GrapeSortPhaseDataset), nameof(request.DatasetId));
+        //
+        // var trainResult =
+        //     await _modelTrainingService.TrainPhaseModelAsync(dataset, cancellationToken: cancellationToken);
+        //
+        // var model = dataset.GrapeSortPhaseForecastModel;
+        // model.ForecastingModelFileReference = new FileReference()
+        // {
+        //     Uri = trainResult.ModelUri
+        // };
+        // model.Accuracy = trainResult.Accuracy;
+        //
+        // _unitOfWork.GrapeSortPhaseForecastModels.Update(model);
+        // await _unitOfWork.SaveChangesAsync(cancellationToken);
+        //
+        // return trainResult;
     }
 
     private Expression<Func<GrapeSort, bool>>? CreateFilterPredicate(GetGrapeSortsRequest request)

@@ -2,7 +2,7 @@
 
 namespace WineQuality.Application.Models.Requests.ProcessPhaseTypes;
 
-public class UpdateProcessPhaseTypeRequest
+public class UpdateProcessPhaseRequest
 {
     [Required] public string Id { get; set; } = null!;
     [Required] public string Name { get; set; } = null!;

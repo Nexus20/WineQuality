@@ -5,14 +5,14 @@ using WineQuality.Domain.Entities;
 
 namespace WineQuality.Application.Mappings;
 
-public class ProcessPhaseTypeProfile : Profile
+public class ProcessPhaseProfile : Profile
 {
-    public ProcessPhaseTypeProfile()
+    public ProcessPhaseProfile()
     {
-        CreateMap<CreateProcessPhaseTypeRequest, ProcessPhaseType>();
-        CreateMap<UpdateProcessPhaseTypeRequest, ProcessPhaseType>();
-        CreateMap<ProcessPhaseType, ProcessPhaseTypeResult>()
+        CreateMap<CreateProcessPhaseRequest, ProcessPhase>();
+        CreateMap<UpdateProcessPhaseRequest, ProcessPhase>();
+        CreateMap<ProcessPhase, ProcessPhaseResult>()
             .ForMember(d => d.Parameters,
-                o => o.MapFrom(s => (s.Parameters ?? new List<ProcessPhaseParameter>()).Select(p => p.Parameter)));
+                o => o.MapFrom(s => (s.Parameters ?? new List<ProcessPhaseParameter>()).Select(p => p.Parameter))).MaxDepth(2);
     }
 }

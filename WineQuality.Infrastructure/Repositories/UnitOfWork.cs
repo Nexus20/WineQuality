@@ -10,26 +10,26 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<GrapeSort> GrapeSorts { get; }
     public IRepository<ProcessParameter> ProcessParameters { get; }
-    public IRepository<ProcessPhaseType> ProcessPhaseTypes { get; }
+    public IRepository<ProcessPhase> ProcessPhases { get; }
     public IRepository<ProcessPhaseParameter> ProcessPhaseParameters { get; }
     public IRepository<WineMaterialBatch> WineMaterialBatches { get; }
-    public IRepository<WineMaterialBatchProcessPhase> WineMaterialBatchProcessPhases { get; }
-    public IRepository<WineMaterialBatchProcessPhaseParameter> WineMaterialBatchProcessPhaseParameters { get; }
-    public IRepository<WineMaterialBatchProcessParameterValue> WineMaterialBatchProcessParameterValues { get; }
+    public IRepository<WineMaterialBatchGrapeSortPhase> WineMaterialBatchProcessPhases { get; }
+    public IRepository<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchProcessPhaseParameters { get; }
+    public IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchProcessParameterValues { get; }
     public IRepository<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; }
     public IRepository<GrapeSortPhaseDataset> GrapeSortPhaseDatasets { get; }
 
     public UnitOfWork(ApplicationDbContext dbContext, IRepository<ProcessParameter> processParameters,
-        IRepository<ProcessPhaseType> processPhaseTypes, IRepository<ProcessPhaseParameter> processPhaseParameters,
+        IRepository<ProcessPhase> processPhases, IRepository<ProcessPhaseParameter> processPhaseParameters,
         IRepository<WineMaterialBatch> wineMaterialBatches,
-        IRepository<WineMaterialBatchProcessPhase> wineMaterialBatchProcessPhases,
-        IRepository<WineMaterialBatchProcessPhaseParameter> wineMaterialBatchProcessPhaseParameters,
-        IRepository<WineMaterialBatchProcessParameterValue> wineMaterialBatchProcessParameterValues,
+        IRepository<WineMaterialBatchGrapeSortPhase> wineMaterialBatchProcessPhases,
+        IRepository<WineMaterialBatchGrapeSortPhaseParameter> wineMaterialBatchProcessPhaseParameters,
+        IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> wineMaterialBatchProcessParameterValues,
         IRepository<GrapeSort> grapeSorts, IRepository<GrapeSortPhaseForecastModel> grapeSortPhaseForecastModels, IRepository<GrapeSortPhaseDataset> grapeSortPhaseDatasets)
     {
         _dbContext = dbContext;
         ProcessParameters = processParameters;
-        ProcessPhaseTypes = processPhaseTypes;
+        ProcessPhases = processPhases;
         ProcessPhaseParameters = processPhaseParameters;
         WineMaterialBatches = wineMaterialBatches;
         WineMaterialBatchProcessPhases = wineMaterialBatchProcessPhases;

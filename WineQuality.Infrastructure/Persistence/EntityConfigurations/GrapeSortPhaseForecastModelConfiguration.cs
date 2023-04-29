@@ -8,9 +8,6 @@ internal class GrapeSortPhaseForecastModelConfiguration : IEntityTypeConfigurati
 {
     public void Configure(EntityTypeBuilder<GrapeSortPhaseForecastModel> builder)
     {
-        builder.HasMany(x => x.Datasets)
-            .WithOne(x => x.GrapeSortPhaseForecastModel)
-            .HasForeignKey(x => x.GrapeSortPhaseForecastModelId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(x => new { x.GrapeSortPhaseId, x.ForecastingModelFileReferenceId }).IsUnique();
     }
 }

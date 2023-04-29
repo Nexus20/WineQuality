@@ -102,12 +102,12 @@ public class WineMaterialBatchService : IWineMaterialBatchService
         if (wineMaterialBatch == null)
             throw new NotFoundException(nameof(WineMaterialBatch), nameof(request.WineMaterialBatchId));
         
-        var processPhaseType = await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.PhaseTypeId, cancellationToken);
+        var processPhase = await _unitOfWork.ProcessPhases.GetByIdAsync(request.PhaseId, cancellationToken);
         
-        if (processPhaseType == null)
-            throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.PhaseTypeId));
+        if (processPhase == null)
+            throw new NotFoundException(nameof(ProcessPhase), nameof(request.PhaseId));
 
-        var entityToAdd = _mapper.Map<AssignWineMaterialBatchToPhaseRequest, WineMaterialBatchProcessPhase>(request);
+        var entityToAdd = _mapper.Map<AssignWineMaterialBatchToPhaseRequest, WineMaterialBatchGrapeSortPhase>(request);
         
         await _unitOfWork.WineMaterialBatchProcessPhases.AddAsync(entityToAdd, cancellationToken: cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

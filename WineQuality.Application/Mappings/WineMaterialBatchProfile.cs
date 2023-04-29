@@ -11,8 +11,15 @@ public class WineMaterialBatchProfile : Profile
     {
         CreateMap<CreateWineMaterialBatchRequest, WineMaterialBatch>();
         CreateMap<UpdateWineMaterialBatchRequest, WineMaterialBatch>();
+        CreateMap<AssignWineMaterialBatchToPhaseRequest, WineMaterialBatchProcessPhase>();
         CreateMap<WineMaterialBatch, WineMaterialBatchResult>()
             .ForMember(d => d.GrapeSort,
-                o => o.MapFrom(s => s.GrapeSort));
+                o => o.MapFrom(s => s.GrapeSort))
+            .ForMember(d => d.Phases,
+                o => o.MapFrom(s => s.Phases));
+
+        CreateMap<WineMaterialBatchProcessPhase, WineMaterialBatchProcessPhaseResult>()
+            .ForMember(d => d.PhaseType,
+                o => o.MapFrom(s => s.PhaseType));
     }
 }

@@ -94,6 +94,25 @@ public class WineMaterialBatchService : IWineMaterialBatchService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task AssignWineMaterialBatchToPhaseAsync(AssignWineMaterialBatchToPhaseRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var wineMaterialBatch = await _unitOfWork.WineMaterialBatches.GetByIdAsync(request.WineMaterialBatchId, cancellationToken);
+        
+        if (wineMaterialBatch == null)
+            throw new NotFoundException(nameof(WineMaterialBatch), nameof(request.WineMaterialBatchId));
+        
+        var processPhaseType = await _unitOfWork.ProcessPhaseTypes.GetByIdAsync(request.PhaseTypeId, cancellationToken);
+        
+        if (processPhaseType == null)
+            throw new NotFoundException(nameof(ProcessPhaseType), nameof(request.PhaseTypeId));
+
+        var entityToAdd = _mapper.Map<AssignWineMaterialBatchToPhaseRequest, WineMaterialBatchProcessPhase>(request);
+        
+        await _unitOfWork.WineMaterialBatchProcessPhases.AddAsync(entityToAdd, cancellationToken: cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     private Expression<Func<WineMaterialBatch, bool>>? CreateFilterPredicate(GetWineMaterialBatchesRequest request)
     {
         Expression<Func<WineMaterialBatch, bool>>? predicate = null;

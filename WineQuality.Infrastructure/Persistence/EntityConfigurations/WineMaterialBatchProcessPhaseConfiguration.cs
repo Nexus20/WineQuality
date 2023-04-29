@@ -8,6 +8,8 @@ internal class WineMaterialBatchProcessPhaseConfiguration : IEntityTypeConfigura
 {
     public void Configure(EntityTypeBuilder<WineMaterialBatchProcessPhase> builder)
     {
+        builder.HasIndex(x => new { x.WineMaterialBatchId, x.PhaseTypeId }).IsUnique();
+        
         builder.HasMany(x => x.Parameters)
             .WithOne(x => x.WineMaterialBatch)
             .HasForeignKey(x => x.WineMaterialBatchId)

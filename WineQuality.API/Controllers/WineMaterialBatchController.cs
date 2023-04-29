@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WineQuality.Application.Exceptions;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.WineMaterialBatches;
 
@@ -61,5 +62,15 @@ public class WineMaterialBatchController : ControllerBase
     {
         await _wineMaterialBatchService.DeleteAsync(id);
         return NoContent();
+    }
+
+    [HttpPost("assign_phase")]
+    public async Task<IActionResult> AssignPhase([FromBody] AssignWineMaterialBatchToPhaseRequest request)
+    {
+        if (request.StartDate >= request.EndDate)
+            return BadRequest(new ErrorDetails("Phase start date can't be greater than phase end date"));
+        
+        await _wineMaterialBatchService.AssignWineMaterialBatchToPhaseAsync(request);
+        return StatusCode(StatusCodes.Status201Created);
     }
 }

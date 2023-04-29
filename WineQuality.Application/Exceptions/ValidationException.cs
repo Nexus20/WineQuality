@@ -1,7 +1,7 @@
 ﻿namespace WineQuality.Application.Exceptions;
 
 [Serializable]
-public class ValidationException : ApplicationException
+public class ValidationException : Exception
 {
     public ValidationException()
     {

@@ -1,7 +1,7 @@
 namespace WineQuality.Application.Exceptions;
 
 [Serializable]
-public class IdentityException : ApplicationException
+public class IdentityException : Exception
 {
     public IdentityException()
     {

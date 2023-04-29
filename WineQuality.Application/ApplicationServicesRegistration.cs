@@ -9,7 +9,7 @@ namespace WineQuality.Application;
 public static class ApplicationServicesRegistration
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services,
-        ConfigurationManager configuration)
+        IConfiguration configuration)
     {
         // services.AddSingleton<EcgTimerManager>();
         // services.AddSingleton<HeartRateTimerManager>();
@@ -19,6 +19,9 @@ public static class ApplicationServicesRegistration
         services.AddScoped<IProcessParameterService, ProcessParameterService>();
         services.AddScoped<IGrapeSortService, GrapeSortService>();
         services.AddScoped<IWineMaterialBatchService, WineMaterialBatchService>();
+
+        services.AddHttpClient<IModelTrainingService, ModelTrainingService>(c => 
+            c.BaseAddress = new Uri(configuration["MachineLearningSettings:ServiceAddress"]));
         // services.AddScoped<IDoctorService, DoctorService>();
         // services.AddScoped<IPatientService, PatientService>();
         // services.AddScoped<IHospitalAdministratorService, HospitalAdministratorService>();

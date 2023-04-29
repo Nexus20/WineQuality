@@ -1,7 +1,7 @@
 ﻿namespace WineQuality.Application.Exceptions;
 
 [Serializable]
-public class NotFoundException : ApplicationException
+public class NotFoundException : Exception
 {
     public NotFoundException()
     {

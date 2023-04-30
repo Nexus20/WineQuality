@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WineQuality.Application.Interfaces.IoT;
 using WineQuality.Application.Interfaces.Services;
-using WineQuality.Application.Models.Requests.GrapeSorts;
 using WineQuality.Application.Models.Requests.ProcessPhaseParameterSensors;
 
 namespace WineQuality.API.Controllers;
@@ -13,10 +13,12 @@ namespace WineQuality.API.Controllers;
 public class ProcessPhaseParameterSensorController : ControllerBase
 {
     private readonly IProcessPhaseParameterSensorService _processPhaseParameterSensorService;
+    private readonly IIoTDeviceService _ioTDeviceService;
 
-    public ProcessPhaseParameterSensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService)
+    public ProcessPhaseParameterSensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService, IIoTDeviceService ioTDeviceService)
     {
         _processPhaseParameterSensorService = processPhaseParameterSensorService;
+        _ioTDeviceService = ioTDeviceService;
     }
 
     [HttpGet]
@@ -49,5 +51,19 @@ public class ProcessPhaseParameterSensorController : ControllerBase
     {
         await _processPhaseParameterSensorService.AssignDeviceToWineMaterialBatchAsync(request);
         return StatusCode(StatusCodes.Status201Created);
+    }
+
+    [HttpPatch("{id}/run")]
+    public async Task<IActionResult> RunSensor(string id)
+    {
+        await _ioTDeviceService.RunSensorAsync(id);
+        return NoContent();
+    }
+
+    [HttpPatch("{id}/stop")]
+    public async Task<IActionResult> StopSensor(string id)
+    {
+        await _ioTDeviceService.StopSensorAsync(id);
+        return NoContent();
     }
 }

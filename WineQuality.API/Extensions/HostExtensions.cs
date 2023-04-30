@@ -3,7 +3,6 @@ using Azure.Messaging.EventHubs.Consumer;
 using Azure.Storage.Blobs;
 using Microsoft.Azure.Devices;
 using WineQuality.Application.Interfaces.Infrastructure;
-using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Infrastructure;
 
 namespace WineQuality.API.Extensions;

@@ -82,7 +82,29 @@ public class ProcessPhaseParameterSensorService : IProcessPhaseParameterSensorSe
 
         return result;
     }
-    
+
+    public async Task AssignDeviceToWineMaterialBatchAsync(AssignDeviceToWineMaterialBatchRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var sensor = await _unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(request.DeviceId, cancellationToken);
+
+        if (sensor == null)
+            throw new NotFoundException(nameof(ProcessPhaseParameterSensor), nameof(request.DeviceId));
+
+        var wineMaterialBatchGrapeSortPhaseParameter =
+            await _unitOfWork.WineMaterialBatchGrapeSortPhaseParameters.GetByIdAsync(
+                request.WineMaterialBatchGrapeSortPhaseParameterId, cancellationToken);
+        
+        if(wineMaterialBatchGrapeSortPhaseParameter == null)
+            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhaseParameter), nameof(request.WineMaterialBatchGrapeSortPhaseParameterId));
+
+        sensor.WineMaterialBatchGrapeSortPhaseParameter = wineMaterialBatchGrapeSortPhaseParameter;
+        sensor.WineMaterialBatchGrapeSortPhaseParameterId = request.WineMaterialBatchGrapeSortPhaseParameterId;
+        
+        _unitOfWork.ProcessPhaseParameterSensors.Update(sensor);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     private Expression<Func<ProcessPhaseParameterSensor, bool>>? CreateFilterPredicate(GetProcessPhaseParameterSensorsRequest request)
     {
         Expression<Func<ProcessPhaseParameterSensor, bool>>? predicate = null;

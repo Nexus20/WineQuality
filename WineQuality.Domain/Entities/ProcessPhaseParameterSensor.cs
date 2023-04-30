@@ -1,4 +1,5 @@
 ﻿using WineQuality.Domain.Entities.Abstract;
+using WineQuality.Domain.Enums;
 
 namespace WineQuality.Domain.Entities;
 
@@ -12,4 +13,6 @@ public class ProcessPhaseParameterSensor : BaseEntity
 
     public string DeviceKey { get; set; }
     public bool IsActive { get; set; }
+
+    public DeviceStatus Status { get; set; } = DeviceStatus.Created;
 }

@@ -38,5 +38,6 @@ app.MapControllers();
 // app.MapHub<HealthMeasurementsHub>("/health-measurements");
 
 app.SetupIdentity();
+await app.StartEventProcessorAsync();
 
 app.Run();

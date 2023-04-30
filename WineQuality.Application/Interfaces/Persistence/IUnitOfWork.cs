@@ -17,6 +17,7 @@ public interface IUnitOfWork
     IRepository<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; }
     IRepository<GrapeSortPhaseDataset> GrapeSortPhaseDatasets { get; }
     IRepository<ProcessPhaseParameterSensor> ProcessPhaseParameterSensors { get; }
+    IRepository<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchGrapeSortPhaseParameters { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     int SaveChanges();
 }

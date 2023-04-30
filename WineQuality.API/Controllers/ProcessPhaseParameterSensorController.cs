@@ -43,4 +43,11 @@ public class ProcessPhaseParameterSensorController : ControllerBase
         var result = await _processPhaseParameterSensorService.CreateSensorAsync(request);
         return StatusCode(StatusCodes.Status201Created, result);
     }
+
+    [HttpPost("assign_wine_material_batch")]
+    public async Task<IActionResult> AssignDeviceToWineMaterialBatch([FromBody] AssignDeviceToWineMaterialBatchRequest request)
+    {
+        await _processPhaseParameterSensorService.AssignDeviceToWineMaterialBatchAsync(request);
+        return StatusCode(StatusCodes.Status201Created);
+    }
 }

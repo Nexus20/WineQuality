@@ -60,6 +60,7 @@ public static class InfrastructureServicesRegistration
 
         var iotHubConnectionString = configuration.GetValue<string>("IoTSettings:HubConnectionString");
         services.AddSingleton(x => RegistryManager.CreateFromConnectionString(iotHubConnectionString));
+        services.AddSingleton(x => ServiceClient.CreateFromConnectionString(iotHubConnectionString));
         services.AddScoped<IIoTDeviceService, AzureIoTDeviceService>();
 
         return services;

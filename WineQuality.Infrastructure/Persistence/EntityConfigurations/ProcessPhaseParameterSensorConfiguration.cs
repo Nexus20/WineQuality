@@ -9,6 +9,5 @@ internal class ProcessPhaseParameterSensorConfiguration : IEntityTypeConfigurati
     public void Configure(EntityTypeBuilder<ProcessPhaseParameterSensor> builder)
     {
         builder.HasIndex(x => x.DeviceKey).IsUnique();
-        builder.HasIndex(x => x.DeviceName).IsUnique();
     }
 }

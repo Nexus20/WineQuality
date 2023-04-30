@@ -20,6 +20,7 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchProcessParameterValues { get; }
     public IRepository<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; }
     public IRepository<GrapeSortPhaseDataset> GrapeSortPhaseDatasets { get; }
+    public IRepository<ProcessPhaseParameterSensor> ProcessPhaseParameterSensors { get; }
 
     public UnitOfWork(ApplicationDbContext dbContext, IRepository<ProcessParameter> processParameters,
         IRepository<ProcessPhase> processPhases, IRepository<ProcessPhaseParameter> processPhaseParameters,
@@ -27,7 +28,7 @@ public class UnitOfWork : IUnitOfWork
         IRepository<WineMaterialBatchGrapeSortPhase> wineMaterialBatchProcessPhases,
         IRepository<WineMaterialBatchGrapeSortPhaseParameter> wineMaterialBatchProcessPhaseParameters,
         IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> wineMaterialBatchProcessParameterValues,
-        IRepository<GrapeSort> grapeSorts, IRepository<GrapeSortPhaseForecastModel> grapeSortPhaseForecastModels, IRepository<GrapeSortPhaseDataset> grapeSortPhaseDatasets, IRepository<GrapeSortPhase> grapeSortPhases, IRepository<GrapeSortProcessPhaseParameterStandard> grapeSortProcessPhaseParameterStandards)
+        IRepository<GrapeSort> grapeSorts, IRepository<GrapeSortPhaseForecastModel> grapeSortPhaseForecastModels, IRepository<GrapeSortPhaseDataset> grapeSortPhaseDatasets, IRepository<GrapeSortPhase> grapeSortPhases, IRepository<GrapeSortProcessPhaseParameterStandard> grapeSortProcessPhaseParameterStandards, IRepository<ProcessPhaseParameterSensor> processPhaseParameterSensors)
     {
         _dbContext = dbContext;
         ProcessParameters = processParameters;
@@ -42,6 +43,7 @@ public class UnitOfWork : IUnitOfWork
         GrapeSortPhaseDatasets = grapeSortPhaseDatasets;
         GrapeSortPhases = grapeSortPhases;
         GrapeSortProcessPhaseParameterStandards = grapeSortProcessPhaseParameterStandards;
+        ProcessPhaseParameterSensors = processPhaseParameterSensors;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

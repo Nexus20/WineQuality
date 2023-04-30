@@ -2,16 +2,19 @@
 using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Azure.Devices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WineQuality.Application.Interfaces.FileStorage;
 using WineQuality.Application.Interfaces.Infrastructure;
+using WineQuality.Application.Interfaces.IoT;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Infrastructure.Auth;
 using WineQuality.Infrastructure.FileStorage;
 using WineQuality.Infrastructure.Identity;
+using WineQuality.Infrastructure.IoT;
 using WineQuality.Infrastructure.Persistence;
 using WineQuality.Infrastructure.Repositories;
 
@@ -54,6 +57,10 @@ public static class InfrastructureServicesRegistration
         var blobStorageConnectionString = configuration.GetValue<string>("BlobStorageSettings:ConnectionString");
         services.AddSingleton(x => new BlobServiceClient(blobStorageConnectionString));
         services.AddScoped<IFileStorageService, BlobStorageService>();
+
+        var iotHubConnectionString = configuration.GetValue<string>("IoTSettings:HubConnectionString");
+        services.AddSingleton(x => RegistryManager.CreateFromConnectionString(iotHubConnectionString));
+        services.AddScoped<IIoTDeviceService, AzureIoTDeviceService>();
 
         return services;
     }

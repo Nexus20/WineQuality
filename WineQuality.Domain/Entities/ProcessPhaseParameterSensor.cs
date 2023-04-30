@@ -11,6 +11,5 @@ public class ProcessPhaseParameterSensor : BaseEntity
     public virtual WineMaterialBatchGrapeSortPhaseParameter? WineMaterialBatchGrapeSortPhaseParameter { get; set; }
 
     public string DeviceKey { get; set; }
-    public string DeviceName { get; set; }
     public bool IsActive { get; set; }
 }

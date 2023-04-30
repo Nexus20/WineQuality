@@ -13,6 +13,12 @@ public class GrapeSortProfile : Profile
         CreateMap<CreateGrapeSortRequest, GrapeSort>();
         CreateMap<UpdateGrapeSortRequest, GrapeSort>();
         CreateMap<GrapeSort, GrapeSortResult>();
+        CreateMap<AssignGrapeSortToPhaseRequest, GrapeSortPhase>();
+
+        CreateMap<GrapeSortPhase, GrapeSortPhaseResult>()
+            .ForMember(d => d.PhaseName, o => o.MapFrom(s => s.Phase.Name))
+            .ForMember(d => d.GrapeSortProcessPhaseParameterStandards,
+                o => o.MapFrom(s => s.GrapeSortProcessPhaseParameterStandards));
 
         CreateMap<GrapeSortPhaseDataset, GrapeSortPhaseDatasetResult>()
             .ForMember(d => d.DatasetInfo, o => o.MapFrom(s => new FileNameWithUrlDto

@@ -103,6 +103,11 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
         return DbContext.Set<TEntity>().AddAsync(entity, cancellationToken).AsTask();
     }
 
+    public Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+    {
+        return DbContext.Set<TEntity>().AddRangeAsync(entities, cancellationToken);
+    }
+
     public void Update(TEntity entity)
     {
         DbContext.Entry(entity).State = EntityState.Modified;

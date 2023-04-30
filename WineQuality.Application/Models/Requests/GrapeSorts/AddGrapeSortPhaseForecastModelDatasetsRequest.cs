@@ -4,6 +4,5 @@ namespace WineQuality.Application.Models.Requests.GrapeSorts;
 
 public class AddGrapeSortPhaseForecastModelDatasetsRequest
 {
-    [Required] public string GrapeSortId { get; set; } = null!;
-    [Required] public string ProcessPhaseId { get; set; } = null!;
+    [Required] public string GrapeSortPhaseId { get; set; } = null!;
 }

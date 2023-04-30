@@ -18,6 +18,7 @@ public static class ApplicationServicesRegistration
         services.AddScoped<IProcessPhaseService, ProcessPhaseService>();
         services.AddScoped<IProcessParameterService, ProcessParameterService>();
         services.AddScoped<IGrapeSortService, GrapeSortService>();
+        services.AddScoped<IGrapeSortStandardService, GrapeSortStandardService>();
         services.AddScoped<IWineMaterialBatchService, WineMaterialBatchService>();
 
         services.AddHttpClient<IModelTrainingService, ModelTrainingService>(c => 

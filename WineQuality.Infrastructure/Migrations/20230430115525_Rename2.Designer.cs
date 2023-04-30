@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WineQuality.Infrastructure.Persistence;
 
@@ -11,9 +12,10 @@ using WineQuality.Infrastructure.Persistence;
 namespace WineQuality.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230430115525_Rename2")]
+    partial class Rename2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -426,50 +428,6 @@ namespace WineQuality.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("ProcessPhaseParameters");
-                });
-
-            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseParameterSensor", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeviceKey")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DeviceName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PhaseParameterId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("WineMaterialBatchGrapeSortPhaseParameterId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeviceKey")
-                        .IsUnique();
-
-                    b.HasIndex("DeviceName")
-                        .IsUnique();
-
-                    b.HasIndex("PhaseParameterId");
-
-                    b.HasIndex("WineMaterialBatchGrapeSortPhaseParameterId");
-
-                    b.ToTable("ProcessPhaseParameterSensors");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatch", b =>
@@ -887,24 +845,6 @@ namespace WineQuality.Infrastructure.Migrations
                     b.Navigation("Phase");
                 });
 
-            modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseParameterSensor", b =>
-                {
-                    b.HasOne("WineQuality.Domain.Entities.ProcessPhaseParameter", "PhaseParameter")
-                        .WithMany("Sensors")
-                        .HasForeignKey("PhaseParameterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameter", "WineMaterialBatchGrapeSortPhaseParameter")
-                        .WithMany("Sensors")
-                        .HasForeignKey("WineMaterialBatchGrapeSortPhaseParameterId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("PhaseParameter");
-
-                    b.Navigation("WineMaterialBatchGrapeSortPhaseParameter");
-                });
-
             modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatch", b =>
                 {
                     b.HasOne("WineQuality.Domain.Entities.GrapeSort", "GrapeSort")
@@ -1033,8 +973,6 @@ namespace WineQuality.Infrastructure.Migrations
             modelBuilder.Entity("WineQuality.Domain.Entities.ProcessPhaseParameter", b =>
                 {
                     b.Navigation("GrapeSortProcessPhaseParameterStandards");
-
-                    b.Navigation("Sensors");
                 });
 
             modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatch", b =>
@@ -1049,8 +987,6 @@ namespace WineQuality.Infrastructure.Migrations
 
             modelBuilder.Entity("WineQuality.Domain.Entities.WineMaterialBatchGrapeSortPhaseParameter", b =>
                 {
-                    b.Navigation("Sensors");
-
                     b.Navigation("Values");
                 });
 

@@ -11,4 +11,6 @@ public class ProcessPhaseParameter : BaseEntity
     public virtual ProcessParameter Parameter { get; set; } = null!;
     
     public virtual List<GrapeSortProcessPhaseParameterStandard>? GrapeSortProcessPhaseParameterStandards { get; set; }
+    
+    public virtual List<ProcessPhaseParameterSensor>? Sensors { get; set; }
 }

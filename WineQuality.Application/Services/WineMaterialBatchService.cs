@@ -94,22 +94,48 @@ public class WineMaterialBatchService : IWineMaterialBatchService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AssignWineMaterialBatchToPhaseAsync(AssignWineMaterialBatchToPhaseRequest request,
+    public async Task AssignWineMaterialBatchToPhasesAsync(AssignWineMaterialBatchToPhasesRequest request,
         CancellationToken cancellationToken = default)
     {
         var wineMaterialBatch = await _unitOfWork.WineMaterialBatches.GetByIdAsync(request.WineMaterialBatchId, cancellationToken);
         
         if (wineMaterialBatch == null)
             throw new NotFoundException(nameof(WineMaterialBatch), nameof(request.WineMaterialBatchId));
-        
-        var processPhase = await _unitOfWork.ProcessPhases.GetByIdAsync(request.PhaseId, cancellationToken);
-        
-        if (processPhase == null)
-            throw new NotFoundException(nameof(ProcessPhase), nameof(request.PhaseId));
 
-        var entityToAdd = _mapper.Map<AssignWineMaterialBatchToPhaseRequest, WineMaterialBatchGrapeSortPhase>(request);
+        var grapeSortPhasesIds = request.Phases.Select(x => x.GrapeSortPhaseId);
         
-        await _unitOfWork.WineMaterialBatchProcessPhases.AddAsync(entityToAdd, cancellationToken: cancellationToken);
+        var grapeSortPhases = await _unitOfWork.GrapeSortPhases.GetAsync(x => grapeSortPhasesIds.Contains(x.Id), cancellationToken);
+        
+        if (grapeSortPhases.Count != grapeSortPhasesIds.Count())
+            throw new ValidationException("At least one grape sort phase id is invalid");
+
+        var entitiesToAdd = request.Phases.Select(x => new WineMaterialBatchGrapeSortPhase
+        {
+            GrapeSortPhaseId = x.GrapeSortPhaseId,
+            WineMaterialBatchId = request.WineMaterialBatchId,
+            StartDate = x.StartDate,
+            EndDate = x.EndDate,
+        }).ToList();
+
+        foreach (var entityToAdd in entitiesToAdd)
+        {
+            var grapeSortPhase =
+                await _unitOfWork.GrapeSortPhases.GetByIdAsync(entityToAdd.GrapeSortPhaseId, cancellationToken);
+
+            var parametersToAdd = grapeSortPhase!.Phase.Parameters
+                .Select(x => new WineMaterialBatchGrapeSortPhaseParameter 
+                {
+                    WineMaterialBatchGrapeSortPhaseId = entityToAdd.Id,
+                    WineMaterialBatchGrapeSortPhase = entityToAdd,
+                    PhaseParameterId = x.Id,
+                    PhaseParameter = x
+                })
+                .ToList();
+
+            entityToAdd.Parameters = parametersToAdd;
+        }
+
+        await _unitOfWork.WineMaterialBatchProcessPhases.AddRangeAsync(entitiesToAdd, cancellationToken: cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

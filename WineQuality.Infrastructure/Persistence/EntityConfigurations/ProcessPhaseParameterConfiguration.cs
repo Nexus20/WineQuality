@@ -14,5 +14,10 @@ internal class ProcessPhaseParameterConfiguration : IEntityTypeConfiguration<Pro
             .WithOne(x => x.PhaseParameter)
             .HasForeignKey(x => x.PhaseParameterId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(x => x.Sensors)
+            .WithOne(x => x.PhaseParameter)
+            .HasForeignKey(x => x.PhaseParameterId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -64,13 +64,13 @@ public class WineMaterialBatchController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("assign_phase")]
-    public async Task<IActionResult> AssignPhase([FromBody] AssignWineMaterialBatchToPhaseRequest request)
+    [HttpPost("assign_phases")]
+    public async Task<IActionResult> AssignPhases([FromBody] AssignWineMaterialBatchToPhasesRequest request)
     {
-        if (request.StartDate >= request.EndDate)
+        if (request.Phases.Any(r => r.StartDate >= r.EndDate))
             return BadRequest(new ErrorDetails("Phase start date can't be greater than phase end date"));
         
-        await _wineMaterialBatchService.AssignWineMaterialBatchToPhaseAsync(request);
+        await _wineMaterialBatchService.AssignWineMaterialBatchToPhasesAsync(request);
         return StatusCode(StatusCodes.Status201Created);
     }
 }

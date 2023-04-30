@@ -9,6 +9,8 @@ public class UnitOfWork : IUnitOfWork
     private readonly ApplicationDbContext _dbContext;
 
     public IRepository<GrapeSort> GrapeSorts { get; }
+    public IRepository<GrapeSortPhase> GrapeSortPhases { get; }
+    public IRepository<GrapeSortProcessPhaseParameterStandard> GrapeSortProcessPhaseParameterStandards { get; }
     public IRepository<ProcessParameter> ProcessParameters { get; }
     public IRepository<ProcessPhase> ProcessPhases { get; }
     public IRepository<ProcessPhaseParameter> ProcessPhaseParameters { get; }
@@ -25,7 +27,7 @@ public class UnitOfWork : IUnitOfWork
         IRepository<WineMaterialBatchGrapeSortPhase> wineMaterialBatchProcessPhases,
         IRepository<WineMaterialBatchGrapeSortPhaseParameter> wineMaterialBatchProcessPhaseParameters,
         IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> wineMaterialBatchProcessParameterValues,
-        IRepository<GrapeSort> grapeSorts, IRepository<GrapeSortPhaseForecastModel> grapeSortPhaseForecastModels, IRepository<GrapeSortPhaseDataset> grapeSortPhaseDatasets)
+        IRepository<GrapeSort> grapeSorts, IRepository<GrapeSortPhaseForecastModel> grapeSortPhaseForecastModels, IRepository<GrapeSortPhaseDataset> grapeSortPhaseDatasets, IRepository<GrapeSortPhase> grapeSortPhases, IRepository<GrapeSortProcessPhaseParameterStandard> grapeSortProcessPhaseParameterStandards)
     {
         _dbContext = dbContext;
         ProcessParameters = processParameters;
@@ -38,6 +40,8 @@ public class UnitOfWork : IUnitOfWork
         GrapeSorts = grapeSorts;
         GrapeSortPhaseForecastModels = grapeSortPhaseForecastModels;
         GrapeSortPhaseDatasets = grapeSortPhaseDatasets;
+        GrapeSortPhases = grapeSortPhases;
+        GrapeSortProcessPhaseParameterStandards = grapeSortProcessPhaseParameterStandards;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -5,6 +5,8 @@ namespace WineQuality.Application.Interfaces.Persistence;
 public interface IUnitOfWork
 {
     IRepository<GrapeSort> GrapeSorts { get; }
+    IRepository<GrapeSortPhase> GrapeSortPhases { get; }
+    IRepository<GrapeSortProcessPhaseParameterStandard> GrapeSortProcessPhaseParameterStandards { get; }
     IRepository<ProcessParameter> ProcessParameters { get; }
     IRepository<ProcessPhase> ProcessPhases { get; }
     IRepository<ProcessPhaseParameter> ProcessPhaseParameters { get; }

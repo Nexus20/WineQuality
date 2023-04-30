@@ -12,5 +12,11 @@ internal class WineMaterialBatchGrapeSortPhaseParameterConfiguration : IEntityTy
             .WithOne(x => x.PhaseParameter)
             .HasForeignKey(x => x.PhaseParameterId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Sensors)
+            .WithOne(x => x.WineMaterialBatchGrapeSortPhaseParameter)
+            .HasForeignKey(x => x.WineMaterialBatchGrapeSortPhaseParameterId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -9,5 +9,5 @@ public interface IWineMaterialBatchService {
     Task<WineMaterialBatchResult> CreateAsync(CreateWineMaterialBatchRequest request, CancellationToken cancellationToken = default);
     Task<WineMaterialBatchResult> UpdateAsync(UpdateWineMaterialBatchRequest request, CancellationToken cancellationToken = default);
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
-    Task AssignWineMaterialBatchToPhaseAsync(AssignWineMaterialBatchToPhaseRequest request, CancellationToken cancellationToken = default);
+    Task AssignWineMaterialBatchToPhasesAsync(AssignWineMaterialBatchToPhasesRequest request, CancellationToken cancellationToken = default);
 }

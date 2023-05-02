@@ -7,6 +7,7 @@ using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.ProcessPhaseParameterSensors;
 using WineQuality.Application.Models.Results.ProcessPhaseParameterSensors;
 using WineQuality.Domain.Entities;
+using WineQuality.Domain.Enums;
 
 namespace WineQuality.Application.Services;
 
@@ -101,8 +102,83 @@ public class ProcessPhaseParameterSensorService : IProcessPhaseParameterSensorSe
         sensor.WineMaterialBatchGrapeSortPhaseParameter = wineMaterialBatchGrapeSortPhaseParameter;
         sensor.WineMaterialBatchGrapeSortPhaseParameterId = request.WineMaterialBatchGrapeSortPhaseParameterId;
         
+        var grapeSortPhaseId = sensor.WineMaterialBatchGrapeSortPhaseParameter
+            .WineMaterialBatchGrapeSortPhase.GrapeSortPhaseId;
+
+        var standard = await _unitOfWork.GrapeSortProcessPhaseParameterStandards.FirstOrDefaultAsync(x =>
+            x.PhaseParameterId == sensor.PhaseParameterId && x.GrapeSortPhaseId == grapeSortPhaseId, cancellationToken);
+
+        if (standard != null)
+        {
+            await _ioTDeviceService.SendStandardsUpdateMessageAsync(sensor, standard, cancellationToken);
+        }
+        
         _unitOfWork.ProcessPhaseParameterSensors.Update(sensor);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RunSensorAsync(string sensorId, CancellationToken cancellationToken = default)
+    {
+        var sensor = await _unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(sensorId, cancellationToken);
+
+        if (sensor == null)
+            throw new NotFoundException(nameof(ProcessPhaseParameterSensor), nameof(sensorId));
+        
+        await _ioTDeviceService.RunSensorAsync(sensor, cancellationToken);
+    }
+
+    public async Task StopSensorAsync(string sensorId, CancellationToken cancellationToken = default)
+    {
+        var sensor = await _unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(sensorId, cancellationToken);
+
+        if (sensor == null)
+            throw new NotFoundException(nameof(ProcessPhaseParameterSensor), nameof(sensorId));
+        
+        await _ioTDeviceService.StopSensorAsync(sensor, cancellationToken);
+    }
+
+    public async Task RunAllPhaseSensorsAsync(string wineMaterialBatchGrapeSortPhaseId, CancellationToken cancellationToken = default)
+    {
+        var wineMaterialBatchGrapeSortPhase =
+            await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(wineMaterialBatchGrapeSortPhaseId,
+                cancellationToken);
+
+        if (wineMaterialBatchGrapeSortPhase == null)
+            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhase), nameof(wineMaterialBatchGrapeSortPhaseId));
+
+        if (!wineMaterialBatchGrapeSortPhase.Parameters.Any())
+            throw new ValidationException("No parameters have been set for this WineMaterialBatchGrapeSortPhase");
+
+        var sensors = wineMaterialBatchGrapeSortPhase.Parameters.SelectMany(x => x.Sensors)
+            .Where(x => x.Status is DeviceStatus.BoundariesUpdated or DeviceStatus.Stopped)
+            .ToList();
+
+        foreach (var sensor in sensors)
+        {
+            await _ioTDeviceService.RunSensorAsync(sensor, cancellationToken);
+        }
+    }
+
+    public async Task StopAllPhaseSensorsAsync(string wineMaterialBatchGrapeSortPhaseId, CancellationToken cancellationToken = default)
+    {
+        var wineMaterialBatchGrapeSortPhase =
+            await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(wineMaterialBatchGrapeSortPhaseId,
+                cancellationToken);
+
+        if (wineMaterialBatchGrapeSortPhase == null)
+            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhase), nameof(wineMaterialBatchGrapeSortPhaseId));
+
+        if (!wineMaterialBatchGrapeSortPhase.Parameters.Any())
+            throw new ValidationException("No parameters have been set for this WineMaterialBatchGrapeSortPhase");
+
+        var sensors = wineMaterialBatchGrapeSortPhase.Parameters.SelectMany(x => x.Sensors)
+            .Where(x => x.Status is DeviceStatus.Working)
+            .ToList();
+
+        foreach (var sensor in sensors)
+        {
+            await _ioTDeviceService.StopSensorAsync(sensor, cancellationToken);
+        }
     }
 
     private Expression<Func<ProcessPhaseParameterSensor, bool>>? CreateFilterPredicate(GetProcessPhaseParameterSensorsRequest request)

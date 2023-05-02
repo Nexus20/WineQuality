@@ -12,12 +12,14 @@ public interface IUnitOfWork
     IRepository<ProcessPhaseParameter> ProcessPhaseParameters { get; }
     IRepository<WineMaterialBatch> WineMaterialBatches { get; }
     IRepository<WineMaterialBatchGrapeSortPhase> WineMaterialBatchProcessPhases { get; }
+    IRepository<WineMaterialBatchGrapeSortPhase> WineMaterialBatchGrapeSortPhases { get; }
     IRepository<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchProcessPhaseParameters { get; }
     IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchProcessParameterValues { get; }
     IRepository<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; }
     IRepository<GrapeSortPhaseDataset> GrapeSortPhaseDatasets { get; }
     IRepository<ProcessPhaseParameterSensor> ProcessPhaseParameterSensors { get; }
     IRepository<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchGrapeSortPhaseParameters { get; }
+    IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchGrapeSortPhaseParameterValues { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     int SaveChanges();
 }

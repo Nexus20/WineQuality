@@ -16,12 +16,17 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<ProcessPhaseParameter> ProcessPhaseParameters { get; }
     public IRepository<WineMaterialBatch> WineMaterialBatches { get; }
     public IRepository<WineMaterialBatchGrapeSortPhase> WineMaterialBatchProcessPhases { get; }
+    public IRepository<WineMaterialBatchGrapeSortPhase> WineMaterialBatchGrapeSortPhases { get; }
     public IRepository<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchProcessPhaseParameters { get; }
     public IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchProcessParameterValues { get; }
     public IRepository<GrapeSortPhaseForecastModel> GrapeSortPhaseForecastModels { get; }
     public IRepository<GrapeSortPhaseDataset> GrapeSortPhaseDatasets { get; }
     public IRepository<ProcessPhaseParameterSensor> ProcessPhaseParameterSensors { get; }
     public IRepository<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchGrapeSortPhaseParameters { get; }
+    public IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchGrapeSortPhaseParameterValues
+    {
+        get;
+    }
 
     public UnitOfWork(ApplicationDbContext dbContext, IRepository<ProcessParameter> processParameters,
         IRepository<ProcessPhase> processPhases, IRepository<ProcessPhaseParameter> processPhaseParameters,
@@ -33,7 +38,7 @@ public class UnitOfWork : IUnitOfWork
         IRepository<GrapeSortPhaseDataset> grapeSortPhaseDatasets, IRepository<GrapeSortPhase> grapeSortPhases,
         IRepository<GrapeSortProcessPhaseParameterStandard> grapeSortProcessPhaseParameterStandards,
         IRepository<ProcessPhaseParameterSensor> processPhaseParameterSensors,
-        IRepository<WineMaterialBatchGrapeSortPhaseParameter> wineMaterialBatchGrapeSortPhaseParameters)
+        IRepository<WineMaterialBatchGrapeSortPhaseParameter> wineMaterialBatchGrapeSortPhaseParameters, IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> wineMaterialBatchGrapeSortPhaseParameterValues, IRepository<WineMaterialBatchGrapeSortPhase> wineMaterialBatchGrapeSortPhases)
     {
         _dbContext = dbContext;
         ProcessParameters = processParameters;
@@ -50,6 +55,8 @@ public class UnitOfWork : IUnitOfWork
         GrapeSortProcessPhaseParameterStandards = grapeSortProcessPhaseParameterStandards;
         ProcessPhaseParameterSensors = processPhaseParameterSensors;
         WineMaterialBatchGrapeSortPhaseParameters = wineMaterialBatchGrapeSortPhaseParameters;
+        WineMaterialBatchGrapeSortPhaseParameterValues = wineMaterialBatchGrapeSortPhaseParameterValues;
+        WineMaterialBatchGrapeSortPhases = wineMaterialBatchGrapeSortPhases;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

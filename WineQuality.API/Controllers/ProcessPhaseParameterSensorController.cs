@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WineQuality.Application.Interfaces.IoT;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.ProcessPhaseParameterSensors;
 
@@ -13,12 +12,10 @@ namespace WineQuality.API.Controllers;
 public class ProcessPhaseParameterSensorController : ControllerBase
 {
     private readonly IProcessPhaseParameterSensorService _processPhaseParameterSensorService;
-    private readonly IIoTDeviceService _ioTDeviceService;
 
-    public ProcessPhaseParameterSensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService, IIoTDeviceService ioTDeviceService)
+    public ProcessPhaseParameterSensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService)
     {
         _processPhaseParameterSensorService = processPhaseParameterSensorService;
-        _ioTDeviceService = ioTDeviceService;
     }
 
     [HttpGet]
@@ -53,17 +50,31 @@ public class ProcessPhaseParameterSensorController : ControllerBase
         return StatusCode(StatusCodes.Status201Created);
     }
 
-    [HttpPatch("{id}/run")]
+    [HttpPost("{id}/run")]
     public async Task<IActionResult> RunSensor(string id)
     {
-        await _ioTDeviceService.RunSensorAsync(id);
-        return NoContent();
+        await _processPhaseParameterSensorService.RunSensorAsync(id);
+        return Accepted();
     }
 
-    [HttpPatch("{id}/stop")]
+    [HttpPost("{id}/stop")]
     public async Task<IActionResult> StopSensor(string id)
     {
-        await _ioTDeviceService.StopSensorAsync(id);
-        return NoContent();
+        await _processPhaseParameterSensorService.StopSensorAsync(id);
+        return Accepted();
+    }
+
+    [HttpPost("{wineMaterialBatchGrapeSortPhaseId}/run_by_phase")]
+    public async Task<IActionResult> RunSensorsByPhase(string wineMaterialBatchGrapeSortPhaseId, CancellationToken cancellationToken)
+    {
+        await _processPhaseParameterSensorService.RunAllPhaseSensorsAsync(wineMaterialBatchGrapeSortPhaseId, cancellationToken);
+        return Accepted();
+    }
+    
+    [HttpPost("{wineMaterialBatchGrapeSortPhaseId}/stop_by_phase")]
+    public async Task<IActionResult> StopSensorsByPhase(string wineMaterialBatchGrapeSortPhaseId, CancellationToken cancellationToken)
+    {
+        await _processPhaseParameterSensorService.StopAllPhaseSensorsAsync(wineMaterialBatchGrapeSortPhaseId, cancellationToken);
+        return Accepted();
     }
 }

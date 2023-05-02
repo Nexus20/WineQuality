@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using WineQuality.Application.Interfaces.Persistence;
+using WineQuality.Domain.Entities;
 using WineQuality.Infrastructure.IoT;
 using DeviceStatus = WineQuality.Domain.Enums.DeviceStatus;
 
@@ -78,6 +79,22 @@ public class WineQualityEventProcessor
 
             if (messageType == MessageType.Readings)
             {
+                var readingsMessage = JsonConvert.DeserializeObject<SensorReadingsMessage>(message);
+                
+                using var scope = _serviceScopeFactory.CreateScope();
+                var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+                var device = await unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(deviceId);
+                var parameter = device.WineMaterialBatchGrapeSortPhaseParameter;
+
+                var valueToAdd = new WineMaterialBatchGrapeSortPhaseParameterValue()
+                {
+                    PhaseParameter = parameter,
+                    PhaseParameterId = device.WineMaterialBatchGrapeSortPhaseParameterId,
+                    Value = readingsMessage.Value
+                };
+
+                await unitOfWork.WineMaterialBatchGrapeSortPhaseParameterValues.AddAsync(valueToAdd);
+                await unitOfWork.SaveChangesAsync();
             }
         }
 

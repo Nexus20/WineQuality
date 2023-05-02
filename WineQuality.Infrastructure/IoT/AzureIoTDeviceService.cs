@@ -30,29 +30,45 @@ public class AzureIoTDeviceService : IIoTDeviceService
         return device.Authentication.SymmetricKey.PrimaryKey;
     }
 
-    public async Task RunSensorAsync(string sensorId, CancellationToken cancellationToken = default)
+    public async Task SendStandardsUpdateMessageAsync(ProcessPhaseParameterSensor sensor,
+        GrapeSortProcessPhaseParameterStandard standard, CancellationToken cancellationToken = default)
     {
-        var sensor = await _unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(sensorId, cancellationToken);
+        if (sensor.Status != DeviceStatus.Ready)
+            return;
+        
+        var standardsUpdateMessage = new StandardsUpdateMessage
+        {
+            UpperBound = standard.UpperBound,
+            LowerBound = standard.LowerBound
+        };
 
-        if (sensor == null)
-            throw new NotFoundException(nameof(ProcessPhaseParameterSensor), nameof(sensorId));
+        var json = JsonConvert.SerializeObject(standardsUpdateMessage);
+        var responseMessage = new Message(Encoding.UTF8.GetBytes(json));
+        responseMessage.Properties.Add(nameof(MessageType), MessageType.Standards.ToString());
+        await _serviceClient.SendAsync(sensor.Id, responseMessage);
+    }
 
-        if (sensor.Status != DeviceStatus.BoundariesUpdated)
+    public async Task RunSensorAsync(ProcessPhaseParameterSensor sensor,
+        CancellationToken cancellationToken = default)
+    {
+        if (sensor.Status == DeviceStatus.Working)
+            return;
+
+        if (sensor.Status != DeviceStatus.BoundariesUpdated && sensor.Status != DeviceStatus.Stopped)
             throw new InvalidSensorStatusException("Can't run sensor when its parameter boundaries haven't been updated");
         
         var statusUpdateMessage = new StatusUpdateMessage(DeviceStatus.Working);
         var json = JsonConvert.SerializeObject(statusUpdateMessage);
         var responseMessage = new Message(Encoding.UTF8.GetBytes(json));
         responseMessage.Properties.Add(nameof(MessageType), MessageType.StatusUpdate.ToString());
-        await _serviceClient.SendAsync(sensorId, responseMessage);
+        await _serviceClient.SendAsync(sensor.Id, responseMessage);
     }
 
-    public async Task StopSensorAsync(string sensorId, CancellationToken cancellationToken = default)
+    public async Task StopSensorAsync(ProcessPhaseParameterSensor sensor,
+        CancellationToken cancellationToken = default)
     {
-        var sensor = await _unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(sensorId, cancellationToken);
-
-        if (sensor == null)
-            throw new NotFoundException(nameof(ProcessPhaseParameterSensor), nameof(sensorId));
+        if (sensor.Status == DeviceStatus.Stopped)
+            return;
         
         if (sensor.Status != DeviceStatus.Working)
             throw new InvalidSensorStatusException("Can't stop sensor because it is not running");
@@ -61,6 +77,6 @@ public class AzureIoTDeviceService : IIoTDeviceService
         var json = JsonConvert.SerializeObject(statusUpdateMessage);
         var responseMessage = new Message(Encoding.UTF8.GetBytes(json));
         responseMessage.Properties.Add(nameof(MessageType), MessageType.StatusUpdate.ToString());
-        await _serviceClient.SendAsync(sensorId, responseMessage);
+        await _serviceClient.SendAsync(sensor.Id, responseMessage);
     }
 }

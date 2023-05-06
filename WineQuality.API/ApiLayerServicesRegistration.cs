@@ -1,5 +1,8 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Reflection;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -10,6 +13,24 @@ public static class ApiLayerServicesRegistration
     public static IServiceCollection AddApiServices(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new List<CultureInfo>
+            {
+                new("en-US"),
+                new("uk-UA")
+            };
+
+            options.DefaultRequestCulture = new RequestCulture("en");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+            options.RequestCultureProviders = new List<IRequestCultureProvider>
+            {
+                new QueryStringRequestCultureProvider(),
+                new CookieRequestCultureProvider()
+            };
+        });
+        
         services.AddCors(o =>
             o.AddPolicy("AllowAll", b => b
                 .WithOrigins("http://localhost:4200")
@@ -28,14 +49,18 @@ public static class ApiLayerServicesRegistration
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wine quality API", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Wine quality API doc", Version = "v1" });
+
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                In = ParameterLocation.Header,
-                Description = "Please insert JWT with Bearer into field",
                 Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey
+                Description = @"JWT Authorization header using the Bearer scheme. 
+                                        Enter 'Bearer' [space] and then your token in the text input below. Example : 'Bearer 12345'",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
             });
+
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -45,11 +70,21 @@ public static class ApiLayerServicesRegistration
                         {
                             Type = ReferenceType.SecurityScheme,
                             Id = "Bearer"
-                        }
+                        },
+                        Scheme = "oauth2",
+                        Name = "Bearer",
+                        In = ParameterLocation.Header
                     },
-                    Array.Empty<string>()
+                    new List<string>()
                 }
             });
+
+            c.CustomSchemaIds(x => x.FullName);
+
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.XML";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+            c.IncludeXmlComments(xmlPath);
         });
 
         var jwtSettings = configuration.GetSection("JwtSettings");

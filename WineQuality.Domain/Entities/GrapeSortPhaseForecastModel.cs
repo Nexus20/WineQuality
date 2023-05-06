@@ -10,4 +10,6 @@ public class GrapeSortPhaseForecastModel : BaseEntity
     public virtual GrapeSortPhase GrapeSortPhase { get; set; } = null!;
     public string? ForecastingModelFileReferenceId { get; set; }
     public virtual FileReference? ForecastingModelFileReference { get; set; }
+    public virtual GrapeSortPhaseDataset Dataset { get; set; } = null!;
+    public string DatasetId { get; set; } = null!;
 }

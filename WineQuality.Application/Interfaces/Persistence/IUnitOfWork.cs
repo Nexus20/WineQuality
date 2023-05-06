@@ -11,7 +11,6 @@ public interface IUnitOfWork
     IRepository<ProcessPhase> ProcessPhases { get; }
     IRepository<ProcessPhaseParameter> ProcessPhaseParameters { get; }
     IRepository<WineMaterialBatch> WineMaterialBatches { get; }
-    IRepository<WineMaterialBatchGrapeSortPhase> WineMaterialBatchProcessPhases { get; }
     IRepository<WineMaterialBatchGrapeSortPhase> WineMaterialBatchGrapeSortPhases { get; }
     IRepository<WineMaterialBatchGrapeSortPhaseParameter> WineMaterialBatchProcessPhaseParameters { get; }
     IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchProcessParameterValues { get; }

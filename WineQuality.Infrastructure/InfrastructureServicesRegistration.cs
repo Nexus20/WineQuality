@@ -11,9 +11,11 @@ using WineQuality.Application.Interfaces.Infrastructure;
 using WineQuality.Application.Interfaces.IoT;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
+using WineQuality.Application.Interfaces.Services.Identity;
 using WineQuality.Infrastructure.Auth;
 using WineQuality.Infrastructure.FileStorage;
 using WineQuality.Infrastructure.Identity;
+using WineQuality.Infrastructure.Identity.Services;
 using WineQuality.Infrastructure.IoT;
 using WineQuality.Infrastructure.Persistence;
 using WineQuality.Infrastructure.Repositories;
@@ -53,6 +55,9 @@ public static class InfrastructureServicesRegistration
         services.AddScoped<IIdentityInitializer, IdentityInitializer>();
         services.AddScoped<ISignInService, SignInService>();
         services.AddScoped<JwtHandler>();
+
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IUserService, UserService>();
         
         var blobStorageConnectionString = configuration.GetValue<string>("BlobStorageSettings:ConnectionString");
         services.AddSingleton(x => new BlobServiceClient(blobStorageConnectionString));

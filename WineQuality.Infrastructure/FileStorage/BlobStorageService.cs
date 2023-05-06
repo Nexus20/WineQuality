@@ -43,6 +43,24 @@ public class BlobStorageService : IFileStorageService
         return new UrlsDto(urls);
     }
 
+    public async Task<bool> DeleteAsync(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            throw new ArgumentException("Url can't be null or whitespace");
+        
+        var containerClient = _blobServiceClient.GetBlobContainerClient("datasets");
+        
+        var fileName = Path.Combine(url.Split('/').Skip(4).ToArray());
+
+        var blobClient = containerClient.GetBlobClient(fileName);
+        var response = await blobClient.DeleteAsync();
+
+        if (response.IsError)
+            return false;
+        
+        return true;
+    }
+
     public async Task<bool> DeleteAsync(UrlsDto urls)
     {
         if (urls.Urls?.Any() == false)

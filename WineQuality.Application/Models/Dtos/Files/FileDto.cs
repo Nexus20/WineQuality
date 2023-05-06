@@ -11,10 +11,9 @@ public class FileDto
     public string GetPathWithFileName()
     {
         var uniqueRandomFileName = Path.GetRandomFileName();
-        var shortClientSideFileNameWithoutExtension = Path.GetFileNameWithoutExtension(Name).TruncateLongString(20);
+        var shortClientSideFileNameWithoutExtension = Path.GetFileNameWithoutExtension(Name).TruncateLongString(30);
         var fileExtension = Path.GetExtension(Name);
-        var basePath = "datasets/";
 
-        return basePath + uniqueRandomFileName + "_" + shortClientSideFileNameWithoutExtension + fileExtension;
+        return uniqueRandomFileName + "_" + shortClientSideFileNameWithoutExtension + fileExtension;
     }
 }

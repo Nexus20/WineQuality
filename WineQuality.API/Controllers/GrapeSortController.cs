@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WineQuality.Application.Exceptions;
 using WineQuality.Application.Interfaces.Services;
-using WineQuality.Application.Models.Dtos.Files;
 using WineQuality.Application.Models.Requests.GrapeSorts;
 using WineQuality.Application.Models.Requests.GrapeSorts.Standards;
 
@@ -76,36 +75,6 @@ public class GrapeSortController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("add_phase_forecast_model_datasets")]
-    public async Task<IActionResult> AddPhaseForecastModelDatasets([FromForm] AddGrapeSortPhaseForecastModelDatasetsRequest request)
-    {
-        if (!Request.Form.Files.Any())
-            return BadRequest();
-        
-        var filesDtos = new List<FileDto>();
-
-        foreach (var formFile in Request.Form.Files)
-        {
-            filesDtos.Add(new FileDto()
-            {
-                Content = formFile.OpenReadStream(),
-                Name = formFile.FileName,
-                ContentType = formFile.ContentType
-            });
-        }
-            
-        var result = await _grapeSortService.AddPhaseForecastModelDatasetsAsync(request, filesDtos);
-        return Ok(result);
-    }
-
-    [HttpPost("train_phase_model")]
-    public async Task<IActionResult> TrainPhaseModel([FromBody] TrainPhaseModelRequest request)
-    {
-        var result = await _grapeSortService.TrainModelByDatasetIdAsync(request);
-
-        return Ok(result);
-    }
-    
     [HttpPost("assign_phase")]
     public async Task<IActionResult> AssignPhase([FromBody] AssignGrapeSortToPhaseRequest request)
     {

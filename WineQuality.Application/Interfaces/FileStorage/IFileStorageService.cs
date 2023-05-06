@@ -6,4 +6,5 @@ public interface IFileStorageService
 {
     Task<UrlsDto> UploadAsync(List<FileDto> files);
     Task<bool> DeleteAsync(UrlsDto urls);
+    Task<bool> DeleteAsync(string url);
 }

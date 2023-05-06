@@ -11,6 +11,8 @@ public static class ApplicationServicesRegistration
     public static IServiceCollection AddApplicationServices(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddLocalization(options => options.ResourcesPath = "Resources");
+        
         // services.AddSingleton<EcgTimerManager>();
         // services.AddSingleton<HeartRateTimerManager>();
         
@@ -18,11 +20,13 @@ public static class ApplicationServicesRegistration
         services.AddScoped<IProcessPhaseService, ProcessPhaseService>();
         services.AddScoped<IProcessParameterService, ProcessParameterService>();
         services.AddScoped<IGrapeSortService, GrapeSortService>();
+        services.AddScoped<IQualityPredictionService, QualityPredictionService>();
+        services.AddScoped<IDatasetService, DatasetService>();
         services.AddScoped<IGrapeSortStandardService, GrapeSortStandardService>();
         services.AddScoped<IWineMaterialBatchService, WineMaterialBatchService>();
         services.AddScoped<IProcessPhaseParameterSensorService, ProcessPhaseParameterSensorService>();
 
-        services.AddHttpClient<IModelTrainingService, ModelTrainingService>(c => 
+        services.AddHttpClient<IMachineLearningService, MachineLearningService>(c => 
             c.BaseAddress = new Uri(configuration["MachineLearningSettings:ServiceAddress"]));
         // services.AddScoped<IDoctorService, DoctorService>();
         // services.AddScoped<IPatientService, PatientService>();

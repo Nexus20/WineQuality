@@ -9,5 +9,9 @@ internal class GrapeSortPhaseForecastModelConfiguration : IEntityTypeConfigurati
     public void Configure(EntityTypeBuilder<GrapeSortPhaseForecastModel> builder)
     {
         builder.HasIndex(x => new { x.GrapeSortPhaseId, x.ForecastingModelFileReferenceId }).IsUnique();
+
+        builder.HasOne(x => x.Dataset)
+            .WithOne()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -26,5 +26,8 @@ public class GrapeSortProfile : Profile
                 Url = s.DatasetFileReference.Uri,
                 Name = s.Name
             }));
+
+        CreateMap<GrapeSortPhaseForecastModel, GrapeSortPhaseForecastModelResult>()
+            .ForMember(d => d.ModelUri, o => o.MapFrom(s => s.ForecastingModelFileReference.Uri));
     }
 }

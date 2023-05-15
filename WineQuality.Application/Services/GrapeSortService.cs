@@ -20,14 +20,14 @@ public class GrapeSortService : IGrapeSortService
         _mapper = mapper;
     }
 
-    public async Task<GrapeSortResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<GrapeSortDetailsResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         var source = await _unitOfWork.GrapeSorts.GetByIdAsync(id, cancellationToken);
 
         if (source == null)
             throw new NotFoundException(nameof(GrapeSort), nameof(id));
 
-        var result = _mapper.Map<GrapeSort, GrapeSortResult>(source);
+        var result = _mapper.Map<GrapeSort, GrapeSortDetailsResult>(source);
 
         return result;
     }
@@ -90,7 +90,7 @@ public class GrapeSortService : IGrapeSortService
         if (grapeSortToDelete == null)
             throw new NotFoundException(nameof(GrapeSort), nameof(id));
         
-        _unitOfWork.GrapeSorts.Delete(grapeSortToDelete);
+        _unitOfWork.GrapeSorts.Remove(grapeSortToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
@@ -130,6 +130,36 @@ public class GrapeSortService : IGrapeSortService
         var result = _mapper.Map<List<GrapeSortPhase>, List<GrapeSortPhaseResult>>(grapeSortPhases);
 
         return result;
+    }
+
+    public async Task SaveGrapeSortPhasesOrderAsync(SaveGrapeSortPhasesOrderRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var grapeSort = await _unitOfWork.GrapeSorts.GetByIdAsync(request.GrapeSortId, cancellationToken);
+        
+        if (grapeSort == null)
+            throw new NotFoundException(nameof(GrapeSort), nameof(request.GrapeSortId));
+
+        var phasesIds = request.Phases.Select(x => x.PhaseId).ToList();
+        var phases = await _unitOfWork.ProcessPhases.GetAsync(x => phasesIds.Contains(x.Id), cancellationToken: cancellationToken);
+
+        if (phases.Count != phasesIds.Count)
+            throw new ValidationException("One or more phase ids are invalid");
+        
+        if(grapeSort.Phases?.Any() == true)
+            _unitOfWork.GrapeSortPhases.RemoveRange(grapeSort.Phases);
+
+        var grapeSortPhasesToAdd = request.Phases.Select(x => new GrapeSortPhase()
+        {
+            GrapeSort = grapeSort,
+            GrapeSortId = request.GrapeSortId,
+            Order = x.Order,
+            PhaseId = x.PhaseId
+        });
+        
+        
+        await _unitOfWork.GrapeSortPhases.AddRangeAsync(grapeSortPhasesToAdd, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
     private Expression<Func<GrapeSort, bool>>? CreateFilterPredicate(GetGrapeSortsRequest request)

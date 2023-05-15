@@ -8,8 +8,7 @@ public class WineMaterialBatchResult : BaseResult
     public string Name { get; set; } = null!;
     public DateTime HarvestDate { get; set; }
     public string HarvestLocation { get; set; } = null!;
-    public List<WineMaterialBatchProcessPhaseResult> Phases { get; set; } = null!;
+    public List<WineMaterialBatchGrapeSortPhaseResult> Phases { get; set; } = null!;
     public GrapeSortResult GrapeSort { get; set; } = null!;
-
-    public WineMaterialBatchProcessPhaseResult? ActivePhase => Phases.FirstOrDefault(x => x.IsActive);
+    public WineMaterialBatchGrapeSortPhaseResult? ActivePhase => Phases.FirstOrDefault(x => x.IsActive);
 }

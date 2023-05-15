@@ -43,7 +43,7 @@ public class DatasetService : IDatasetService
 
         await _fileStorageService.DeleteAsync(dataset.DatasetFileReference.Uri);
         
-        _unitOfWork.GrapeSortPhaseDatasets.Delete(dataset);
+        _unitOfWork.GrapeSortPhaseDatasets.Remove(dataset);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

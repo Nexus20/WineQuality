@@ -91,31 +91,47 @@ public class ProcessPhaseService : IProcessPhaseService
         if (processPhaseToDelete == null)
             throw new NotFoundException(nameof(ProcessPhase), nameof(id));
         
-        _unitOfWork.ProcessPhases.Delete(processPhaseToDelete);
+        _unitOfWork.ProcessPhases.Remove(processPhaseToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AddParameterAsync(AddParameterToPhaseRequest request, CancellationToken cancellationToken = default)
+    public async Task AddParametersAsync(AddParametersToPhaseRequest request, CancellationToken cancellationToken = default)
     {
         var processPhase = await _unitOfWork.ProcessPhases.GetByIdAsync(request.ProcessPhaseId, cancellationToken);
         
         if (processPhase == null)
             throw new NotFoundException(nameof(ProcessPhase), nameof(request.ProcessPhaseId));
         
-        var processParameter = await _unitOfWork.ProcessParameters.GetByIdAsync(request.ProcessParameterId, cancellationToken);
+        var processParameters = await _unitOfWork.ProcessParameters.GetAsync(x => request.ProcessParameterIds.Contains(x.Id), cancellationToken);
         
-        if (processParameter == null)
-            throw new NotFoundException(nameof(ProcessParameter), nameof(request.ProcessParameterId));
+        if (processParameters.Count != request.ProcessParameterIds.Length)
+            throw new ValidationException("One or more process parameters ids are invalid");
 
-        var processPhaseParameterToAdd = new ProcessPhaseParameter()
+        var processPhaseParametersToAdd = processParameters.Select(x => new ProcessPhaseParameter()
         {
-            ParameterId = request.ProcessParameterId,
-            Parameter = processParameter,
+            ParameterId = x.Id,
+            Parameter = x,
             PhaseId = request.ProcessPhaseId,
             Phase = processPhase,
-        };
+        });
 
-        await _unitOfWork.ProcessPhaseParameters.AddAsync(processPhaseParameterToAdd, cancellationToken);
+        await _unitOfWork.ProcessPhaseParameters.AddRangeAsync(processPhaseParametersToAdd, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+    
+    public async Task RemoveParametersAsync(RemoveParametersFromPhaseRequest request, CancellationToken cancellationToken = default)
+    {
+        var processPhase = await _unitOfWork.ProcessPhases.GetByIdAsync(request.ProcessPhaseId, cancellationToken);
+        
+        if (processPhase == null)
+            throw new NotFoundException(nameof(ProcessPhase), nameof(request.ProcessPhaseId));
+        
+        var processPhasesParameters = await _unitOfWork.ProcessPhaseParameters.GetAsync(x => request.ProcessParameterIds.Contains(x.ParameterId) && x.PhaseId == request.ProcessPhaseId, cancellationToken);
+        
+        if (processPhasesParameters.Count != request.ProcessParameterIds.Length)
+            throw new ValidationException("One or more process parameters ids are invalid");
+
+        _unitOfWork.ProcessPhaseParameters.RemoveRange(processPhasesParameters);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 

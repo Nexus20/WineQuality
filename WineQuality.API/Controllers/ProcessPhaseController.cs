@@ -63,10 +63,17 @@ public class ProcessPhaseController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("add_parameter")]
-    public async Task<IActionResult> AddParameterToPhase([FromBody] AddParameterToPhaseRequest request)
+    [HttpPost("add_parameters")]
+    public async Task<IActionResult> AddParametersToPhase([FromBody] AddParametersToPhaseRequest request)
     {
-        await _processPhaseService.AddParameterAsync(request);
-        return Ok();
+        await _processPhaseService.AddParametersAsync(request);
+        return NoContent();
+    }
+    
+    [HttpPost("remove_parameters")]
+    public async Task<IActionResult> RemoveParametersFromPhase([FromBody] RemoveParametersFromPhaseRequest request)
+    {
+        await _processPhaseService.RemoveParametersAsync(request);
+        return NoContent();
     }
 }

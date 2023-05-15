@@ -9,8 +9,6 @@ public class ProcessPhaseParameterSensorProfile : Profile
 {
     public ProcessPhaseParameterSensorProfile()
     {
-        CreateMap<CreateProcessPhaseParameterSensorRequest, ProcessPhaseParameterSensor>()
-            .ForMember(d => d.Id, o => o.MapFrom(s => s.DeviceId));
         CreateMap<ProcessPhaseParameterSensor, ProcessPhaseParameterSensorResult>()
             .ForMember(d => d.ParameterId, o => o.MapFrom(s => s.PhaseParameter.ParameterId))
             .ForMember(d => d.ParameterName, o => o.MapFrom(s => s.PhaseParameter.Parameter.Name))

@@ -9,6 +9,6 @@ public class WineMaterialBatchDetailsResult : BaseResult
     public DateTime HarvestDate { get; set; }
     public string HarvestLocation { get; set; } = null!;
     public GrapeSortResult GrapeSort { get; set; } = null!;
-    public WineMaterialBatchProcessPhaseResult? ActivePhase { get; set; }
-    public List<WineMaterialBatchProcessPhaseReadingsResult>? ParametersReadings { get; set; }
+    public List<WineMaterialBatchGrapeSortPhaseResult> Phases { get; set; } = null!;
+    public ActiveWineMaterialBatchGrapeSortPhaseResult? ActivePhase { get; set; }
 }

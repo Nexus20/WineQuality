@@ -10,9 +10,8 @@ public class ProcessPhaseParameterSensorResult : BaseResult
     public string PhaseName { get; set; } = null!;
     public string ParameterId { get; set; } = null!;
     public string ParameterName { get; set; } = null!;
-
-    public string? WineMaterialBatchGrapeSortPhaseParameterId { get; set; }
     
+    public string? WineMaterialBatchGrapeSortPhaseParameterId { get; set; }
     public string? WineBatchId { get; set; }
     public string? WineBatchName { get; set; }
 

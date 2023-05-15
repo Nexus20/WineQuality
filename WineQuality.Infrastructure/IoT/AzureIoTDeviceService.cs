@@ -3,7 +3,6 @@ using Microsoft.Azure.Devices;
 using Newtonsoft.Json;
 using WineQuality.Application.Exceptions;
 using WineQuality.Application.Interfaces.IoT;
-using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Models.Requests.ProcessPhaseParameterSensors;
 using WineQuality.Domain.Entities;
 using DeviceStatus = WineQuality.Domain.Enums.DeviceStatus;
@@ -12,22 +11,25 @@ namespace WineQuality.Infrastructure.IoT;
 
 public class AzureIoTDeviceService : IIoTDeviceService
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly RegistryManager _registryManager;
     private readonly ServiceClient _serviceClient;
 
-    public AzureIoTDeviceService(RegistryManager registryManager, IUnitOfWork unitOfWork, ServiceClient serviceClient)
+    public AzureIoTDeviceService(RegistryManager registryManager, ServiceClient serviceClient)
     {
         _registryManager = registryManager;
-        _unitOfWork = unitOfWork;
         _serviceClient = serviceClient;
     }
 
-    public async Task<string> AddDeviceAsync(CreateProcessPhaseParameterSensorRequest request, CancellationToken cancellationToken = default)
+    public async Task<string> AddDeviceAsync(string deviceId, CancellationToken cancellationToken = default)
     {
-        var device = await _registryManager.AddDeviceAsync(new Device(request.DeviceId), cancellationToken);
+        var device = await _registryManager.AddDeviceAsync(new Device(deviceId), cancellationToken);
 
         return device.Authentication.SymmetricKey.PrimaryKey;
+    }
+
+    public Task RemoveDeviceAsync(string deviceId, CancellationToken cancellationToken = default)
+    {
+        return _registryManager.RemoveDeviceAsync(deviceId, cancellationToken);
     }
 
     public async Task SendStandardsUpdateMessageAsync(ProcessPhaseParameterSensor sensor,

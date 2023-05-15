@@ -8,5 +8,5 @@ public class CreateGrapeSortProcessPhaseParameterStandardRequest
     public double? UpperBound { get; set; }
     
     [Required] public string GrapeSortPhaseId { get; set; } = null!;
-    [Required] public string PhaseParameterId { get; set; } = null!;
+    [Required] public string ParameterId { get; set; } = null!;
 }

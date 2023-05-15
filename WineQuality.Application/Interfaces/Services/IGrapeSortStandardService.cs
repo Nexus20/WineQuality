@@ -7,4 +7,6 @@ public interface IGrapeSortStandardService
 {
     Task<GrapeSortProcessPhaseParameterStandardResult> CreateGrapeSortPhaseParameterStandardAsync(
         CreateGrapeSortProcessPhaseParameterStandardRequest request, CancellationToken cancellationToken = default);
+
+    Task UpdateGrapeSortPhaseParameterStandardsAsync(UpdateGrapeSortProcessPhaseParameterStandardsRequest request, CancellationToken cancellationToken = default);
 }

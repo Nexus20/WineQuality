@@ -126,6 +126,13 @@ public class WineMaterialBatchController : ControllerBase
         return StatusCode(StatusCodes.Status201Created);
     }
 
+    [HttpGet("{id}/start_allowed")]
+    public async Task<IActionResult> CheckIfProcessStartAllowedAsync(string id, CancellationToken cancellationToken)
+    {
+        var result = await _wineMaterialBatchService.CheckIfProcessStartAllowedAsync(id, cancellationToken);
+        return Ok(result);
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -150,5 +157,27 @@ public class WineMaterialBatchController : ControllerBase
         await _wineMaterialBatchService.StopWineProcessingForPhaseAsync(request);
 
         return Accepted();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPut("update_terms")]
+    public async Task<IActionResult> UpdatePhasesTerms([FromBody] UpdateWineMaterialBatchPhasesTermsRequest request)
+    {
+        if (request.Terms.Any(x => x.StartDate >= x.EndDate))
+            return BadRequest("Phase start date can't be equal or greater than end date");
+
+        for (var i = 1; i < request.Terms.Count; i++)
+        {
+            if (request.Terms[i].StartDate < request.Terms[i - 1].EndDate)
+                return BadRequest("Next phase start date can't be less than previous phase end date");
+        }
+
+        await _wineMaterialBatchService.UpdatePhasesTermsAsync(request);
+        
+        return NoContent();
     }
 }

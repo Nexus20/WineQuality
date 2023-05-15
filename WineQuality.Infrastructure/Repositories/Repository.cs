@@ -88,7 +88,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
 
     public virtual Task<TEntity?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        return DbContext.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
+        return DbContext.Set<TEntity>().SingleOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
     }
 
     public virtual Task<TResult?> GetByIdAsync<TResult>(string id, CancellationToken cancellationToken = default) where TResult : BaseResult
@@ -113,8 +113,13 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
         DbContext.Entry(entity).State = EntityState.Modified;
     }
 
-    public virtual void Delete(TEntity entity)
+    public virtual void Remove(TEntity entity)
     {
         DbContext.Set<TEntity>().Remove(entity);
+    }
+
+    public virtual void RemoveRange(IEnumerable<TEntity> entities)
+    {
+        DbContext.Set<TEntity>().RemoveRange(entities);
     }
 }

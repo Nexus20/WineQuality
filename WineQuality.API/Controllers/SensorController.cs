@@ -6,18 +6,31 @@ using WineQuality.Application.Models.Requests.ProcessPhaseParameterSensors;
 
 namespace WineQuality.API.Controllers;
 
+/// <summary>
+/// 
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class ProcessPhaseParameterSensorController : ControllerBase
+public class SensorController : ControllerBase
 {
     private readonly IProcessPhaseParameterSensorService _processPhaseParameterSensorService;
 
-    public ProcessPhaseParameterSensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService)
+    /// <summary>
+    /// Preferable DI constructor.
+    /// </summary>
+    /// <param name="processPhaseParameterSensorService">For sensors management.</param>
+    public SensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService)
     {
         _processPhaseParameterSensorService = processPhaseParameterSensorService;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery]GetProcessPhaseParameterSensorsRequest request, CancellationToken cancellationToken)
     {
@@ -27,12 +40,32 @@ public class ProcessPhaseParameterSensorController : ControllerBase
     }
 
     // GET: api/GrapeSort/5
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
     {
         var result = await _processPhaseParameterSensorService.GetByIdAsync(id, cancellationToken: cancellationToken);
         
         return Ok(result);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(string id, CancellationToken cancellationToken)
+    {
+        await _processPhaseParameterSensorService.DeleteSensorAsync(id, cancellationToken: cancellationToken);
+
+        return NoContent();
     }
     
     // POST: api/GrapeSort

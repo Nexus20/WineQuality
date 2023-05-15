@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
 using WineQuality.Application.Exceptions;
+using WineQuality.Application.Helpers.Expressions;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.ProcessParameters;
@@ -90,7 +91,7 @@ public class ProcessParameterService : IProcessParameterService
         if (processParameterToDelete == null)
             throw new NotFoundException(nameof(ProcessParameter), nameof(id));
         
-        _unitOfWork.ProcessParameters.Delete(processParameterToDelete);
+        _unitOfWork.ProcessParameters.Remove(processParameterToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
@@ -98,7 +99,13 @@ public class ProcessParameterService : IProcessParameterService
     {
         Expression<Func<ProcessParameter, bool>>? predicate = null;
 
-        // TODO: Add some code
+        if (!string.IsNullOrWhiteSpace(request.PhaseId))
+        {
+            Expression<Func<ProcessParameter, bool>> searchPhaseExpression = x =>
+                x.Phases != null && x.Phases.Select(p => p.PhaseId).Contains(request.PhaseId);
+            
+            predicate = ExpressionsHelper.And(predicate, searchPhaseExpression);
+        }
         
         return predicate;
     }

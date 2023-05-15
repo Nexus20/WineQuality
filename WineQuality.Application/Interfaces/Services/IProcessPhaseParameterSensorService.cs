@@ -13,4 +13,5 @@ public interface IProcessPhaseParameterSensorService
     Task StopAllPhaseSensorsAsync(string wineMaterialBatchGrapeSortPhaseId, CancellationToken cancellationToken = default);
     Task RunSensorAsync(string sensorId, CancellationToken cancellationToken = default);
     Task StopSensorAsync(string sensorId, CancellationToken cancellationToken = default);
+    Task DeleteSensorAsync(string id, CancellationToken cancellationToken = default);
 }

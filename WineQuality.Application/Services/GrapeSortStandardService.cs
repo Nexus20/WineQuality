@@ -27,12 +27,14 @@ public class GrapeSortStandardService : IGrapeSortStandardService
         if (grapeSortPhase == null)
             throw new NotFoundException(nameof(GrapeSortPhase), nameof(request.GrapeSortPhaseId));
         
-        var phaseParameter = await _unitOfWork.ProcessPhaseParameters.GetByIdAsync(request.PhaseParameterId, cancellationToken);
+        var phaseParameter = await _unitOfWork.ProcessPhaseParameters.FirstOrDefaultAsync(x => x.ParameterId == request.ParameterId && x.PhaseId == grapeSortPhase.PhaseId, cancellationToken);
         
         if (phaseParameter == null)
-            throw new NotFoundException(nameof(ProcessPhaseParameter), nameof(request.PhaseParameterId));
+            throw new ValidationException($"Parameter with id {request.ParameterId} doesn't belong to phase with id {grapeSortPhase.PhaseId}");
 
         var entityToAdd = _mapper.Map<CreateGrapeSortProcessPhaseParameterStandardRequest, GrapeSortProcessPhaseParameterStandard>(request);
+        entityToAdd.PhaseParameterId = phaseParameter.Id;
+        entityToAdd.PhaseParameter = phaseParameter;
         
         await _unitOfWork.GrapeSortProcessPhaseParameterStandards.AddAsync(entityToAdd, cancellationToken: cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -43,5 +45,26 @@ public class GrapeSortStandardService : IGrapeSortStandardService
         var result = _mapper.Map<GrapeSortProcessPhaseParameterStandard, GrapeSortProcessPhaseParameterStandardResult>(source!);
 
         return result;
+    }
+
+    public async Task UpdateGrapeSortPhaseParameterStandardsAsync(UpdateGrapeSortProcessPhaseParameterStandardsRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var standardsIds = request.Standards.Select(x => x.StandardId);
+        var standardsToUpdate = await _unitOfWork.GrapeSortProcessPhaseParameterStandards.GetAsync(x => standardsIds.Contains(x.Id), cancellationToken);
+
+        if (standardsToUpdate.Count != standardsIds.Count())
+            throw new ValidationException("One or more standards ids are invalid");
+        
+        standardsToUpdate.ForEach(x =>
+        {
+            var requestPart = request.Standards.Single(s => s.StandardId == x.Id);
+            x.UpperBound = requestPart.UpperBound;
+            x.LowerBound = requestPart.LowerBound;
+            
+            _unitOfWork.GrapeSortProcessPhaseParameterStandards.Update(x);
+        });
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

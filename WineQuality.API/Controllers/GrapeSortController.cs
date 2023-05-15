@@ -66,6 +66,23 @@ public class GrapeSortController : ControllerBase
         var result = await _grapeSortService.UpdateAsync(request);
         return Ok(result);
     }
+    
+    // PUT: api/GrapeSort/5
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPut("{id}/save_phases_order")]
+    public async Task<IActionResult> SavePhasesOrder(string id, [FromBody] SaveGrapeSortPhasesOrderRequest request)
+    {
+        if (id != request.GrapeSortId)
+            return BadRequest();
+        
+        await _grapeSortService.SaveGrapeSortPhasesOrderAsync(request);
+        return NoContent();
+    }
 
     // DELETE: api/GrapeSort/5
     [HttpDelete("{id}")]
@@ -94,5 +111,22 @@ public class GrapeSortController : ControllerBase
         var result = await _grapeSortStandardService.CreateGrapeSortPhaseParameterStandardAsync(request);
         
         return StatusCode(StatusCodes.Status201Created, result);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPut("update_standards")]
+    public async Task<IActionResult> UpdateStandards(
+        [FromBody] UpdateGrapeSortProcessPhaseParameterStandardsRequest request)
+    {
+        if(request.Standards.Any(x => x.LowerBound >= x.UpperBound))
+            return BadRequest("Parameter lower bound can't be greater or equal than upper bound");
+        
+        await _grapeSortStandardService.UpdateGrapeSortPhaseParameterStandardsAsync(request);
+        
+        return NoContent();
     }
 }

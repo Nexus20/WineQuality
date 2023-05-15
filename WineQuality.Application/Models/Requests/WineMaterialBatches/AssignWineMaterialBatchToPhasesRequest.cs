@@ -15,3 +15,15 @@ public class AssignWineMaterialBatchToPhasesRequest
         [Required] public string GrapeSortPhaseId { get; set; } = null!;
     }
 }
+
+public class UpdateWineMaterialBatchPhasesTermsRequest
+{
+    [Required] public List<UpdateWineMaterialBatchPhasesTerm> Terms { get; set; } = null!;
+
+    public class UpdateWineMaterialBatchPhasesTerm
+    {
+        [Required] public string Id { get; set; } = null!;
+        [Required] public DateTime StartDate { get; set; }
+        [Required] public DateTime EndDate { get; set; }
+    }
+}

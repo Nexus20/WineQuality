@@ -24,27 +24,61 @@ public class ProcessPhaseParameterSensorService : IProcessPhaseParameterSensorSe
         _mapper = mapper;
     }
 
+    public async Task DeleteSensorAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var sensor = await _unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(id, cancellationToken);
+
+        if (sensor == null)
+            throw new NotFoundException(nameof(ProcessPhaseParameterSensor), nameof(id));
+
+        if (sensor.Status == DeviceStatus.Working)
+            throw new ValidationException("Unable to delete working sensor");
+
+        await _ioTDeviceService.RemoveDeviceAsync(id, cancellationToken);
+        _unitOfWork.ProcessPhaseParameterSensors.Remove(sensor);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<ProcessPhaseParameterSensorResult> CreateSensorAsync(CreateProcessPhaseParameterSensorRequest request, CancellationToken cancellationToken = default)
     {
-        var phaseParameterExists =
-            await _unitOfWork.ProcessPhaseParameters.ExistsAsync(x => x.Id == request.PhaseParameterId,
+        var phaseParameter = await _unitOfWork.ProcessPhaseParameters.FirstOrDefaultAsync(x => x.ParameterId == request.ParameterId && x.PhaseId == request.PhaseId,
                 cancellationToken);
 
-        if (!phaseParameterExists)
-            throw new NotFoundException(nameof(ProcessPhaseParameter), nameof(request.PhaseParameterId));
-        
-        var duplicateExists = await _unitOfWork.ProcessPhaseParameterSensors.ExistsAsync(x => x.Id == request.DeviceId, cancellationToken);
+        if (phaseParameter == null)
+            throw new ValidationException($"ProcessPhaseParameter with parameter id #{request.ParameterId} and phase id #{request.PhaseId} does not exist");
 
-        if (duplicateExists)
-            throw new ValidationException($"Sensor with such id {request.DeviceId} already exists");
+        var phaseName = phaseParameter.Phase.Name.ToLower();
+        var parameterName = string.Join('-', phaseParameter.Parameter.Name.ToLower().Split(' ', StringSplitOptions.TrimEntries));
 
-        var deviceKey = await _ioTDeviceService.AddDeviceAsync(request, cancellationToken);
+        var deviceId = $"{phaseName}-{parameterName}-";
+
+        var phaseParameterSensors =
+            await _unitOfWork.ProcessPhaseParameterSensors.GetAsync(x => x.PhaseParameterId == phaseParameter.Id, cancellationToken: cancellationToken);
+
+        if (!phaseParameterSensors.Any())
+        {
+            deviceId += "1";
+        }
+        else
+        {
+            var lastExistingDeviceNumber = phaseParameterSensors.Select(x =>
+                {
+                    var idParts = x.Id.Split('-');
+                    return int.Parse(idParts[^1]);
+                })
+                .Max();
+
+            lastExistingDeviceNumber++;
+            deviceId += $"{lastExistingDeviceNumber}";
+        }
+
+        var deviceKey = await _ioTDeviceService.AddDeviceAsync(deviceId, cancellationToken);
 
         var sensorEntityToAdd = new ProcessPhaseParameterSensor()
         {
-            Id = request.DeviceId,
+            Id = deviceId,
             DeviceKey = deviceKey,
-            PhaseParameterId = request.PhaseParameterId
+            PhaseParameterId = phaseParameter.Id
         };
 
         await _unitOfWork.ProcessPhaseParameterSensors.AddAsync(sensorEntityToAdd, cancellationToken);

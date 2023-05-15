@@ -31,6 +31,6 @@ internal class GrapeSortPhaseConfiguration : IEntityTypeConfiguration<GrapeSortP
             .WithOne(x => x.NextPhase)
             .OnDelete(DeleteBehavior.Restrict);
         
-        builder.HasIndex(x => x.Order).IsUnique();
+        builder.HasIndex(x => new {x.Order, x.PhaseId, x.GrapeSortId}).IsUnique();
     }
 }

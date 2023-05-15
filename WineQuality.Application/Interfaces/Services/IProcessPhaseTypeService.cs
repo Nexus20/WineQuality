@@ -9,5 +9,6 @@ public interface IProcessPhaseService {
     Task<ProcessPhaseResult> CreateAsync(CreateProcessPhaseRequest request, CancellationToken cancellationToken = default);
     Task<ProcessPhaseResult> UpdateAsync(UpdateProcessPhaseRequest request, CancellationToken cancellationToken = default);
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
-    Task AddParameterAsync(AddParameterToPhaseRequest request, CancellationToken cancellationToken = default);
+    Task AddParametersAsync(AddParametersToPhaseRequest request, CancellationToken cancellationToken = default);
+    Task RemoveParametersAsync(RemoveParametersFromPhaseRequest request, CancellationToken cancellationToken = default);
 }

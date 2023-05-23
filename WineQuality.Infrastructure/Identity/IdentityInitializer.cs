@@ -55,7 +55,8 @@ public class IdentityInitializer : IIdentityInitializer
             Email = "root@wine-quality.com",
             FirstName = "root",
             LastName = "root",
-            PhoneNumber = "000"
+            PhoneNumber = "000",
+            SelectedCulture = "en-US",
         };
 
         _userManager.CreateAsync(superAdmin, "_QGrXyvcmTD4aVQJ_").Wait();

@@ -27,7 +27,7 @@ public class ProcessPhaseService : IProcessPhaseService
         if (source == null)
             throw new NotFoundException(nameof(ProcessPhase), nameof(id));
 
-        var result = _mapper.Map<ProcessPhase, ProcessPhaseResult>(source);
+        var result = _mapper.Map<ProcessPhase, ProcessPhaseDetailResult>(source);
 
         return result;
     }
@@ -42,9 +42,8 @@ public class ProcessPhaseService : IProcessPhaseService
             return new List<ProcessPhaseResult>();
 
         var result = _mapper.Map<List<ProcessPhase>, List<ProcessPhaseResult>>(source);
-
-        // TODO: Move order by into querying data
-        return result.OrderBy(x => x.Order).ToList();
+        
+        return result;
     }
 
     public async Task<ProcessPhaseResult> CreateAsync(CreateProcessPhaseRequest request, CancellationToken cancellationToken = default)

@@ -10,4 +10,5 @@ public class AppUser : IdentityUser, ITimeMarkedEntity
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public virtual List<AppUserRole> UserRoles { get; set; }
+    public string SelectedCulture { get; set; } = null!;
 }

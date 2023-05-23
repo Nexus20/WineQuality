@@ -11,7 +11,9 @@ public class ProcessPhaseProfile : Profile
     {
         CreateMap<CreateProcessPhaseRequest, ProcessPhase>();
         CreateMap<UpdateProcessPhaseRequest, ProcessPhase>();
-        CreateMap<ProcessPhase, ProcessPhaseResult>()
+        CreateMap<ProcessPhase, ProcessPhaseResult>();
+        
+        CreateMap<ProcessPhase, ProcessPhaseDetailResult>()
             .ForMember(d => d.Parameters,
                 o => o.MapFrom(s => (s.Parameters ?? new List<ProcessPhaseParameter>()).Select(p => p.Parameter))).MaxDepth(2);
     }

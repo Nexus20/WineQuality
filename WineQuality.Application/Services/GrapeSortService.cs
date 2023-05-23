@@ -90,6 +90,22 @@ public class GrapeSortService : IGrapeSortService
         if (grapeSortToDelete == null)
             throw new NotFoundException(nameof(GrapeSort), nameof(id));
         
+        if(grapeSortToDelete.WineMaterialBatches?.Any() == true)
+            throw new ValidationException("Can't delete grape sort if it has wine material batches");
+
+        if (grapeSortToDelete.Phases?.Any() == true)
+        {
+            foreach (var phase in grapeSortToDelete.Phases)
+            {
+                if (phase.GrapeSortProcessPhaseParameterStandards?.Any() == true)
+                {
+                    _unitOfWork.GrapeSortProcessPhaseParameterStandards.RemoveRange(phase.GrapeSortProcessPhaseParameterStandards);
+                }
+            }
+            
+            _unitOfWork.GrapeSortPhases.RemoveRange(grapeSortToDelete.Phases);
+        }
+        
         _unitOfWork.GrapeSorts.Remove(grapeSortToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
@@ -129,7 +145,7 @@ public class GrapeSortService : IGrapeSortService
 
         var result = _mapper.Map<List<GrapeSortPhase>, List<GrapeSortPhaseResult>>(grapeSortPhases);
 
-        return result;
+        return result.OrderBy(x => x.Order).ToList();
     }
 
     public async Task SaveGrapeSortPhasesOrderAsync(SaveGrapeSortPhasesOrderRequest request,
@@ -157,9 +173,19 @@ public class GrapeSortService : IGrapeSortService
             PhaseId = x.PhaseId
         });
         
-        
         await _unitOfWork.GrapeSortPhases.AddRangeAsync(grapeSortPhasesToAdd, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<GrapeSortPhaseResult> GetPhaseByIdAsync(string grapeSortPhaseId, CancellationToken cancellationToken)
+    {
+        var grapeSortPhase = await _unitOfWork.GrapeSortPhases.GetByIdAsync(grapeSortPhaseId, cancellationToken);
+        
+        if (grapeSortPhase == null)
+            throw new NotFoundException(nameof(GrapeSortPhase), nameof(grapeSortPhaseId));
+        
+        var result = _mapper.Map<GrapeSortPhase, GrapeSortPhaseResult>(grapeSortPhase);
+        return result;
     }
 
     private Expression<Func<GrapeSort, bool>>? CreateFilterPredicate(GetGrapeSortsRequest request)

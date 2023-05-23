@@ -48,7 +48,8 @@ public class BlobStorageService : IFileStorageService
         if (string.IsNullOrWhiteSpace(url))
             throw new ArgumentException("Url can't be null or whitespace");
         
-        var containerClient = _blobServiceClient.GetBlobContainerClient("datasets");
+        var containerName = url.Split('/').Skip(3).Take(1).First();
+        var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         
         var fileName = Path.Combine(url.Split('/').Skip(4).ToArray());
 

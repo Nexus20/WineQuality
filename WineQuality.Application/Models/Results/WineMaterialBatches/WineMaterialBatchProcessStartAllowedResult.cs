@@ -11,3 +11,15 @@ public class WineMaterialBatchProcessStartAllowedResult
         StartAllowed = false;
     }
 }
+
+public class WineMaterialBatchPhaseParameterChartDataResult
+{
+    public List<DateTime> Labels { get; set; }
+    public List<double> Values { get; set; }
+
+    public WineMaterialBatchPhaseParameterChartDataResult()
+    {
+        Labels = new List<DateTime>();
+        Values = new List<double>();
+    }
+}

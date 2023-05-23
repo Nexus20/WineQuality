@@ -13,5 +13,6 @@ public class AppUserProfile : Profile
             .ForMember(d => d.Roles, o => o.MapFrom(s => s.UserRoles.Select(ur => ur.Role)));
         CreateMap<CreateUserRequest, AppUser>()
             .ForMember(d => d.UserName, o => o.MapFrom(s => s.Email));
+        CreateMap<UpdateUserRequest, AppUser>();
     }
 }

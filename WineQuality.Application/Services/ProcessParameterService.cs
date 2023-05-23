@@ -80,7 +80,7 @@ public class ProcessParameterService : IProcessParameterService
         _unitOfWork.ProcessParameters.Update(processParameterToUpdate);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        var result = _mapper.Map<ProcessParameter, ProcessParameterResult>(processParameterToUpdate);
+        var result = _mapper.Map<ProcessParameter, ProcessParameterDetailsResult>(processParameterToUpdate);
         return result;
     }
 

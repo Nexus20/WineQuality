@@ -12,7 +12,7 @@ namespace WineQuality.API.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = CustomRoles.Admin)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{CustomRoles.Admin}, {CustomRoles.SuperAdmin}")]
 public class RoleController : ControllerBase
 {
     private readonly IRoleService _roleService;

@@ -1,5 +1,6 @@
 using WineQuality.API;
 using WineQuality.API.Extensions;
+using WineQuality.API.Hubs;
 using WineQuality.API.Middlewares;
 using WineQuality.Application;
 using WineQuality.Infrastructure;
@@ -35,7 +36,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-// app.MapHub<HealthMeasurementsHub>("/health-measurements");
+app.MapHub<WineQualityHub>("/wine-quality");
 
 app.SetupIdentity();
 app.UseCustomRequestLocalization(app.Configuration);

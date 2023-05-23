@@ -17,7 +17,7 @@ public class WineMaterialBatchProfile : Profile
                 o => o.MapFrom(s => s.GrapeSort))
             .ForMember(d => d.Phases,
                 o => o.MapFrom(s => s.Phases));
-        
+
         CreateMap<WineMaterialBatch, WineMaterialBatchDetailsResult>()
             .ForMember(d => d.GrapeSort,
                 o => o.MapFrom(s => s.GrapeSort))
@@ -40,7 +40,19 @@ public class WineMaterialBatchProfile : Profile
             .ForMember(d => d.ParameterId, o => o.MapFrom(s => s.PhaseParameter.Parameter.Id))
             .ForMember(d => d.ParameterName, o => o.MapFrom(s => s.PhaseParameter.Parameter.Name));
 
-        CreateMap<WineMaterialBatchGrapeSortPhaseParameter, WineMaterialBatchGrapeSortPhaseParameterResult>()
-            .ForMember(d => d.Parameter, o => o.MapFrom(s => s.PhaseParameter.Parameter));
+        CreateMap<WineMaterialBatchGrapeSortPhaseParameter, WineMaterialBatchGrapeSortPhaseParameterResult>();
+        // .ForMember(d => d.Parameter, o => o.MapFrom(s => s.PhaseParameter.Parameter));
+
+        CreateMap<WineMaterialBatchGrapeSortPhaseParameterValue, WineMaterialBatchGrapeSortPhaseParameterValueResult>();
+
+        CreateMap<WineMaterialBatchGrapeSortPhaseParameter, WineMaterialBatchGrapeSortPhaseParameterDetailsResult>()
+            .ForMember(d => d.Parameter, o => o.MapFrom(s => s.PhaseParameter.Parameter))
+            .ForMember(d => d.Sensors, o => o.MapFrom(s => s.Sensors));
+
+        CreateMap<WineMaterialBatchGrapeSortPhase, WineMaterialBatchGrapeSortPhaseDetailsResult>()
+            .ForMember(d => d.Phase,
+                o => o.MapFrom(s => s.GrapeSortPhase))
+            .ForMember(d => d.ParametersDetails,
+                o => o.MapFrom(s => s.Parameters));
     }
 }

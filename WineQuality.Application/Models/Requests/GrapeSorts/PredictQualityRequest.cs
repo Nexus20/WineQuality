@@ -6,7 +6,9 @@ public class PredictQualityRequest
 {
     [Required]
     public string ForecastModelId { get; set; } = null!;
-
+    
     [Required]
-    public Dictionary<string, double> ParametersValues { get; set; } = null!;
+    public string WineMaterialBatchGrapeSortPhaseId { get; set; } = null!;
+    
+    public Dictionary<string, double>? ParametersValues { get; set; }
 }

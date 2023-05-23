@@ -1,10 +1,14 @@
 ﻿using System.Text;
+using AutoMapper;
 using Azure.Messaging.EventHubs.Processor;
 using Microsoft.Azure.Devices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using WineQuality.Application.Interfaces.Infrastructure;
 using WineQuality.Application.Interfaces.Persistence;
+using WineQuality.Application.Models.InternalCommunication;
+using WineQuality.Application.Models.Results.WineMaterialBatches;
 using WineQuality.Domain.Entities;
 using WineQuality.Infrastructure.IoT;
 using DeviceStatus = WineQuality.Domain.Enums.DeviceStatus;
@@ -16,13 +20,17 @@ public class WineQualityEventProcessor
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly ServiceClient _serviceClient;
     private readonly ILogger<WineQualityEventProcessor> _logger;
+    private readonly IInternalCommunicator _internalCommunicator;
+    private readonly IMapper _mapper;
 
     public WineQualityEventProcessor(IServiceScopeFactory serviceScopeFactory, ServiceClient serviceClient,
-        ILogger<WineQualityEventProcessor> logger)
+        ILogger<WineQualityEventProcessor> logger, IInternalCommunicator internalCommunicator, IMapper mapper)
     {
         _serviceScopeFactory = serviceScopeFactory;
         _serviceClient = serviceClient;
         _logger = logger;
+        _internalCommunicator = internalCommunicator;
+        _mapper = mapper;
     }
 
     public async Task OnProcessingEventBatchAsync(ProcessEventArgs args)
@@ -62,7 +70,14 @@ public class WineQualityEventProcessor
                         var standardsUpdateMessage = new StandardsUpdateMessage
                         {
                             UpperBound = standard.UpperBound,
-                            LowerBound = standard.LowerBound
+                            LowerBound = standard.LowerBound,
+                            PhaseName = standard.PhaseParameter.Phase.Name,
+                            ParameterName = standard.PhaseParameter.Parameter.Name,
+                            GrapeSortName = standard.GrapeSortPhase.GrapeSort.Name,
+                            WineMaterialBatchId = device.WineMaterialBatchGrapeSortPhaseParameter
+                                .WineMaterialBatchGrapeSortPhase.WineMaterialBatchId,
+                            WineMaterialBatchName = device.WineMaterialBatchGrapeSortPhaseParameter
+                                .WineMaterialBatchGrapeSortPhase.WineMaterialBatch.Name
                         };
 
                         var json = JsonConvert.SerializeObject(standardsUpdateMessage);
@@ -75,6 +90,12 @@ public class WineQualityEventProcessor
                 device.Status = statusUpdateMessage.Status;
                 unitOfWork.ProcessPhaseParameterSensors.Update(device);
                 await unitOfWork.SaveChangesAsync();
+
+                await _internalCommunicator.SendDeviceStatusUpdatedMessageAsync(new SensorStatusUpdatedMessage()
+                {
+                    DeviceId = deviceId,
+                    NewStatus = statusUpdateMessage.Status
+                });
             }
 
             if (messageType == MessageType.Readings)
@@ -95,6 +116,14 @@ public class WineQualityEventProcessor
 
                 await unitOfWork.WineMaterialBatchGrapeSortPhaseParameterValues.AddAsync(valueToAdd);
                 await unitOfWork.SaveChangesAsync();
+                
+                var valueToSend = _mapper.Map<WineMaterialBatchGrapeSortPhaseParameterValue, WineMaterialBatchGrapeSortPhaseParameterValueResult>(valueToAdd);
+                
+                await _internalCommunicator.SendReadingsMessageAsync(new ReadingsMessage()
+                {
+                    DeviceId = deviceId,
+                    Value = valueToSend
+                });
             }
         }
 

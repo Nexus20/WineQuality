@@ -28,6 +28,9 @@ public class UnitOfWork : IUnitOfWork
         get;
     }
 
+    public IRepository<FileReference> FileReferences { get; }
+    public IRepository<QualityPrediction> QualityPredictions { get; }
+
     public UnitOfWork(ApplicationDbContext dbContext, IRepository<ProcessParameter> processParameters,
         IRepository<ProcessPhase> processPhases, IRepository<ProcessPhaseParameter> processPhaseParameters,
         IRepository<WineMaterialBatch> wineMaterialBatches,
@@ -38,7 +41,11 @@ public class UnitOfWork : IUnitOfWork
         IRepository<GrapeSortPhaseDataset> grapeSortPhaseDatasets, IRepository<GrapeSortPhase> grapeSortPhases,
         IRepository<GrapeSortProcessPhaseParameterStandard> grapeSortProcessPhaseParameterStandards,
         IRepository<ProcessPhaseParameterSensor> processPhaseParameterSensors,
-        IRepository<WineMaterialBatchGrapeSortPhaseParameter> wineMaterialBatchGrapeSortPhaseParameters, IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> wineMaterialBatchGrapeSortPhaseParameterValues, IRepository<WineMaterialBatchGrapeSortPhase> wineMaterialBatchGrapeSortPhases)
+        IRepository<WineMaterialBatchGrapeSortPhaseParameter> wineMaterialBatchGrapeSortPhaseParameters, 
+        IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> wineMaterialBatchGrapeSortPhaseParameterValues, 
+        IRepository<WineMaterialBatchGrapeSortPhase> wineMaterialBatchGrapeSortPhases, 
+        IRepository<FileReference> fileReferences, 
+        IRepository<QualityPrediction> qualityPredictions)
     {
         _dbContext = dbContext;
         ProcessParameters = processParameters;
@@ -57,6 +64,8 @@ public class UnitOfWork : IUnitOfWork
         WineMaterialBatchGrapeSortPhaseParameters = wineMaterialBatchGrapeSortPhaseParameters;
         WineMaterialBatchGrapeSortPhaseParameterValues = wineMaterialBatchGrapeSortPhaseParameterValues;
         WineMaterialBatchGrapeSortPhases = wineMaterialBatchGrapeSortPhases;
+        FileReferences = fileReferences;
+        QualityPredictions = qualityPredictions;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

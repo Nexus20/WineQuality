@@ -11,11 +11,16 @@ internal class FileReferenceConfiguration : IEntityTypeConfiguration<FileReferen
         builder.HasMany(x => x.GrapeSortPhaseForecastModels)
             .WithOne(x => x.ForecastingModelFileReference)
             .HasForeignKey(x => x.ForecastingModelFileReferenceId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.GrapeSortPhaseDatasets)
             .WithOne(x => x.DatasetFileReference)
             .HasForeignKey(x => x.DatasetFileReferenceId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.QualityPredictions)
+            .WithOne(x => x.FileReference)
+            .HasForeignKey(x => x.FileReferenceId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

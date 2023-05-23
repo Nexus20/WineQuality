@@ -18,4 +18,6 @@ public class ProcessPhaseParameterSensorResult : BaseResult
     public string DeviceKey { get; set; } = null!;
     public bool IsActive { get; set; }
     public DeviceStatus Status { get; set; }
+    
+    public double? LastValue { get; set; }
 }

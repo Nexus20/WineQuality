@@ -12,4 +12,5 @@ public interface IGrapeSortService {
     Task AssignGrapeSortToPhaseAsync(AssignGrapeSortToPhaseRequest request, CancellationToken cancellationToken = default);
     Task<List<GrapeSortPhaseResult>> GetPhasesByGrapeSortIdAsync(string grapeSortId, CancellationToken cancellationToken = default);
     Task SaveGrapeSortPhasesOrderAsync(SaveGrapeSortPhasesOrderRequest request, CancellationToken cancellationToken = default);
+    Task<GrapeSortPhaseResult> GetPhaseByIdAsync(string grapeSortPhaseId, CancellationToken cancellationToken);
 }

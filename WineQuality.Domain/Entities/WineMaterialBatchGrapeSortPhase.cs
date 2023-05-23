@@ -13,4 +13,5 @@ public class WineMaterialBatchGrapeSortPhase : BaseEntity
     public string GrapeSortPhaseId { get; set; } = null!;
     public virtual GrapeSortPhase GrapeSortPhase { get; set; } = null!;
     public virtual List<WineMaterialBatchGrapeSortPhaseParameter>? Parameters { get; set; }
+    public virtual List<QualityPrediction>? QualityPredictions { get; set; }
 }

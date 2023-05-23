@@ -15,4 +15,7 @@ public interface IWineMaterialBatchService {
     Task<WineMaterialBatchDetailsResult> GetDetailsByIdAsync(string id, CancellationToken cancellationToken = default);
     Task UpdatePhasesTermsAsync(UpdateWineMaterialBatchPhasesTermsRequest request, CancellationToken cancellationToken = default);
     Task<WineMaterialBatchProcessStartAllowedResult> CheckIfProcessStartAllowedAsync(string id, CancellationToken cancellationToken = default);
+    Task<WineMaterialBatchGrapeSortPhaseDetailsResult> GetPhaseDetailsByIdAsync(string phaseId, CancellationToken cancellationToken = default);
+    Task<WineMaterialBatchProcessStartAllowedResult> CheckIfPhaseStartAllowedAsync(string phaseId, CancellationToken cancellationToken);
+    Task<WineMaterialBatchPhaseParameterChartDataResult> GetPhaseParametersChartAsync(GetWineMaterialBatchPhaseParameterChartDataRequest request, CancellationToken cancellationToken = default);
 }

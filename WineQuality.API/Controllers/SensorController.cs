@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
+using WineQuality.Application;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.ProcessPhaseParameterSensors;
+using WineQuality.Domain.Enums;
 
 namespace WineQuality.API.Controllers;
 
@@ -15,14 +18,17 @@ namespace WineQuality.API.Controllers;
 public class SensorController : ControllerBase
 {
     private readonly IProcessPhaseParameterSensorService _processPhaseParameterSensorService;
+    private readonly IStringLocalizer<SharedResource> _stringLocalizer;
 
     /// <summary>
     /// Preferable DI constructor.
     /// </summary>
     /// <param name="processPhaseParameterSensorService">For sensors management.</param>
-    public SensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService)
+    /// <param name="stringLocalizer"></param>
+    public SensorController(IProcessPhaseParameterSensorService processPhaseParameterSensorService, IStringLocalizer<SharedResource> stringLocalizer)
     {
         _processPhaseParameterSensorService = processPhaseParameterSensorService;
+        _stringLocalizer = stringLocalizer;
     }
 
     /// <summary>
@@ -69,6 +75,11 @@ public class SensorController : ControllerBase
     }
     
     // POST: api/GrapeSort
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] CreateProcessPhaseParameterSensorRequest request)
     {
@@ -76,8 +87,8 @@ public class SensorController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, result);
     }
 
-    [HttpPost("assign_wine_material_batch")]
-    public async Task<IActionResult> AssignDeviceToWineMaterialBatch([FromBody] AssignDeviceToWineMaterialBatchRequest request)
+    [HttpPost("assign_devices_to_wine_material_batch")]
+    public async Task<IActionResult> AssignDevicesToWineMaterialBatch([FromBody] AssignDevicesToWineMaterialBatchRequest request)
     {
         await _processPhaseParameterSensorService.AssignDeviceToWineMaterialBatchAsync(request);
         return StatusCode(StatusCodes.Status201Created);
@@ -109,5 +120,24 @@ public class SensorController : ControllerBase
     {
         await _processPhaseParameterSensorService.StopAllPhaseSensorsAsync(wineMaterialBatchGrapeSortPhaseId, cancellationToken);
         return Accepted();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("statuses")]
+    [ProducesResponseType(typeof(IDictionary<DeviceStatus, string>), 200)]
+    public IActionResult GetStatuses()
+    {
+        var localizedStatuses = Enum.GetValues<DeviceStatus>()
+            .OrderBy(s => s)
+            .Select(s => new
+            {
+                Status = s,
+                Value = _stringLocalizer[$"{nameof(DeviceStatus)}_{(int)s}"].Value
+            });
+
+        return Ok(localizedStatuses);
     }
 }

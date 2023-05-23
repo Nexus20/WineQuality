@@ -40,10 +40,16 @@ public class DatasetService : IDatasetService
 
         if (dataset == null)
             throw new NotFoundException(nameof(GrapeSortPhaseDataset), nameof(id));
+        
+        var datasetModelExists = await _unitOfWork.GrapeSortPhaseForecastModels.ExistsAsync(x => x.DatasetId == dataset.Id, cancellationToken);
+        
+        if(datasetModelExists)
+            throw new ValidationException($"Dataset with id {id} cannot be deleted because it is used in forecast models");
 
         await _fileStorageService.DeleteAsync(dataset.DatasetFileReference.Uri);
         
         _unitOfWork.GrapeSortPhaseDatasets.Remove(dataset);
+        _unitOfWork.FileReferences.Remove(dataset.DatasetFileReference);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
@@ -56,7 +62,7 @@ public class DatasetService : IDatasetService
             throw new ValidationException("Files cannot be empty");
         }
         
-        var validTypes = new[] { "text/csv" };
+        var validTypes = new[] { "text/csv", "application/vnd.ms-excel" };
         
         if (filesDtos.Any(x => !validTypes.Contains(x.ContentType)))
         {
@@ -107,6 +113,4 @@ public class DatasetService : IDatasetService
         
         return result;
     }
-    
-    
 }

@@ -47,6 +47,14 @@ public class GrapeSortController : ControllerBase
 
         return Ok(result);
     }
+    
+    [HttpGet("phases/{id}")]
+    public async Task<IActionResult> GetPhaseById(string id, CancellationToken cancellationToken)
+    {
+        var result = await _grapeSortService.GetPhaseByIdAsync(id, cancellationToken);
+
+        return Ok(result);
+    }
 
     // POST: api/GrapeSort
     [HttpPost]
@@ -85,6 +93,11 @@ public class GrapeSortController : ControllerBase
     }
 
     // DELETE: api/GrapeSort/5
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
@@ -92,16 +105,21 @@ public class GrapeSortController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("assign_phase")]
-    public async Task<IActionResult> AssignPhase([FromBody] AssignGrapeSortToPhaseRequest request)
-    {
-        if (request.Order < 1)
-            return BadRequest(new ErrorDetails("Phase order can't be lower than 1"));
-        
-        await _grapeSortService.AssignGrapeSortToPhaseAsync(request);
-        return StatusCode(StatusCodes.Status201Created);
-    }
+    // [HttpPost("assign_phase")]
+    // public async Task<IActionResult> AssignPhase([FromBody] AssignGrapeSortToPhaseRequest request)
+    // {
+    //     if (request.Order < 1)
+    //         return BadRequest(new ErrorDetails("Phase order can't be lower than 1"));
+    //     
+    //     await _grapeSortService.AssignGrapeSortToPhaseAsync(request);
+    //     return StatusCode(StatusCodes.Status201Created);
+    // }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("create_standard")]
     public async Task<IActionResult> CreateStandard([FromBody] CreateGrapeSortProcessPhaseParameterStandardRequest request)
     {

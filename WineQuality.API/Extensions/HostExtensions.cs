@@ -1,4 +1,5 @@
-﻿using Azure.Messaging.EventHubs;
+﻿using AutoMapper;
+using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Consumer;
 using Azure.Storage.Blobs;
 using Microsoft.Azure.Devices;
@@ -31,8 +32,10 @@ public static class HostExtensions
         var serviceScopeFactory = host.Services.GetRequiredService<IServiceScopeFactory>();
         var logger = host.Services.GetRequiredService<ILogger<WineQualityEventProcessor>>();
         var serviceClient = ServiceClient.CreateFromConnectionString(configuration.GetValue<string>("IoTSettings:HubConnectionString"));
+        var internalCommunicator = host.Services.GetRequiredService<IInternalCommunicator>();
+        var mapper = host.Services.GetRequiredService<IMapper>();
         
-        var processor = new WineQualityEventProcessor(serviceScopeFactory, serviceClient, logger);
+        var processor = new WineQualityEventProcessor(serviceScopeFactory, serviceClient, logger, internalCommunicator, mapper);
             
         eventProcessorClient.ProcessEventAsync += processor.OnProcessingEventBatchAsync;
         eventProcessorClient.ProcessErrorAsync += processor.OnProcessingErrorAsync;

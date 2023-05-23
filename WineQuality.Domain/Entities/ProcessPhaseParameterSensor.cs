@@ -15,4 +15,6 @@ public class ProcessPhaseParameterSensor : BaseEntity
     public bool IsActive { get; set; }
 
     public DeviceStatus Status { get; set; } = DeviceStatus.Created;
+    
+    public double? LastValue => WineMaterialBatchGrapeSortPhaseParameter?.Values?.OrderByDescending(v => v.CreatedAt).FirstOrDefault()?.Value;
 }

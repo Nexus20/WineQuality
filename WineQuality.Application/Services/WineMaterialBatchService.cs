@@ -61,6 +61,198 @@ public class WineMaterialBatchService : IWineMaterialBatchService
 
         return result;
     }
+    
+    public async Task<WineMaterialBatchProcessStartAllowedResult> CheckIfPhaseStartAllowedAsync(string phaseId, CancellationToken cancellationToken)
+    {
+        var phase = await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(phaseId, cancellationToken);
+        
+        if (phase == null)
+            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhase), nameof(phaseId));
+        
+        var result = new WineMaterialBatchProcessStartAllowedResult();
+        
+        if (phase.IsActive)
+        {
+            throw new ValidationException("Phase has been already started");
+        }
+
+        var phaseOrder = phase.GrapeSortPhase.Order;
+
+        if (phaseOrder != 1)
+        {
+            var previousActivePhase = await _unitOfWork.WineMaterialBatchGrapeSortPhases.FirstOrDefaultAsync(x => x.WineMaterialBatchId == phase.WineMaterialBatchId && phase.GrapeSortPhase.Order < phaseOrder && phase.IsActive, cancellationToken);
+
+            if (previousActivePhase != null)
+            {
+                result.StartNotAllowedReasons.Add($"Phase \"{previousActivePhase.GrapeSortPhase.Phase.Name}\" has to be finished first");
+            }
+        } 
+        
+        if (phase.StartDate == DateTime.MinValue || phase.EndDate == DateTime.MinValue)
+        {
+            result.StartNotAllowedReasons.Add("Phase can't be started because terms are not set");
+        }
+        
+        var phaseSensorsNotReady = phase.Parameters.Any(p =>
+            p.Sensors == null 
+            || p.Sensors.Count == 0 
+            || p.Sensors.All(x => x.Status != DeviceStatus.Stopped 
+                                  && x.Status != DeviceStatus.BoundariesUpdated));
+        
+        if (phaseSensorsNotReady)
+        {
+            result.StartNotAllowedReasons.Add($"Phase \"{phase.GrapeSortPhase.Phase.Name}\" doesn't have ready sensors for all parameters");
+        }
+        
+        if (!result.StartNotAllowedReasons.Any())
+            result.StartAllowed = true;
+            
+        return result;
+    }
+
+    public async Task<WineMaterialBatchPhaseParameterChartDataResult> GetPhaseParametersChartAsync(GetWineMaterialBatchPhaseParameterChartDataRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var source = await _unitOfWork.WineMaterialBatchGrapeSortPhaseParameterValues.GetAsync(x => x.PhaseParameterId == request.WineMaterialBatchGrapeSortPhaseParameterId, cancellationToken);
+        
+        if(source == null || !source.Any())
+            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhaseParameter), nameof(request.WineMaterialBatchGrapeSortPhaseParameterId));
+
+        var result = new WineMaterialBatchPhaseParameterChartDataResult();
+        
+        switch(request.ChartType)
+        {
+            case ParameterChartType.Hour:
+                result = AggregateByMinutes(source, 5);
+                break;
+            case ParameterChartType.Day:
+                result = AggregateByHours(source);
+                break;
+            case ParameterChartType.Week:
+                result = AggregateByDays(source, 7, 1);
+                break;
+            case ParameterChartType.Month:
+                result = AggregateByDays(source, 30, 1);
+                break;
+            case ParameterChartType.Year:
+            case ParameterChartType.AllTime:
+                result = AggregateByMonths(source);
+                break;
+        }
+
+        return result;
+    }
+
+    private WineMaterialBatchPhaseParameterChartDataResult AggregateByMonths(List<WineMaterialBatchGrapeSortPhaseParameterValue> source)
+    {
+        var result = new WineMaterialBatchPhaseParameterChartDataResult();
+
+        source.OrderBy(x => x.CreatedAt)
+            .GroupBy(p => new
+            {
+                p.CreatedAt.Year,
+                p.CreatedAt.Month
+            })
+            .ToList()
+            .ForEach(g =>
+            {
+                var label = new DateTime(g.Key.Year, g.Key.Month, 1);
+                var value = g.Average(p => p.Value);
+                result.Labels.Add(label);
+                result.Values.Add(value);
+            });
+
+        return result;
+    }
+
+    private WineMaterialBatchPhaseParameterChartDataResult AggregateByDays(List<WineMaterialBatchGrapeSortPhaseParameterValue> source, int daysCount, int aggregateByDaysCount)
+    {
+        var result = new WineMaterialBatchPhaseParameterChartDataResult();
+
+        source.Where(x => DateTime.UtcNow - x.CreatedAt < TimeSpan.FromDays(daysCount))
+            .Where(x => x.CreatedAt.Day % aggregateByDaysCount == 0)
+            .OrderBy(x => x.CreatedAt)
+            .GroupBy(p => new
+            {
+                p.CreatedAt.Year,
+                p.CreatedAt.Month,
+                p.CreatedAt.Day
+            })
+            .ToList()
+            .ForEach(g =>
+            {
+                var label = new DateTime(g.Key.Year, g.Key.Month, g.Key.Day);
+                var value = g.Average(p => p.Value);
+                result.Labels.Add(label);
+                result.Values.Add(value);
+            });
+
+        return result;
+    }
+    
+    private WineMaterialBatchPhaseParameterChartDataResult AggregateByHours(List<WineMaterialBatchGrapeSortPhaseParameterValue> source)
+    {
+        var result = new WineMaterialBatchPhaseParameterChartDataResult();
+
+        source.Where(x => DateTime.UtcNow - x.CreatedAt < TimeSpan.FromDays(1))
+            .OrderBy(x => x.CreatedAt)
+            .GroupBy(p => new
+            {
+                p.CreatedAt.Year,
+                p.CreatedAt.Month,
+                p.CreatedAt.Day,
+                p.CreatedAt.Hour
+            })
+            .ToList()
+            .ForEach(g =>
+            {
+                var label = new DateTime(g.Key.Year, g.Key.Month, g.Key.Day, g.Key.Hour, 0, 0);
+                var value = g.Average(p => p.Value);
+                result.Labels.Add(label);
+                result.Values.Add(value);
+            });
+
+        return result;
+    }
+
+    private WineMaterialBatchPhaseParameterChartDataResult AggregateByMinutes(List<WineMaterialBatchGrapeSortPhaseParameterValue> source, int i)
+    {
+        var result = new WineMaterialBatchPhaseParameterChartDataResult();
+
+        source.Where(x => DateTime.UtcNow - x.CreatedAt < TimeSpan.FromHours(1))
+            .Where(x => x.CreatedAt.Minute % 5 == 0)
+            .OrderBy(x => x.CreatedAt)
+            .GroupBy(p => new
+            {
+                p.CreatedAt.Year,
+                p.CreatedAt.Month,
+                p.CreatedAt.Day,
+                p.CreatedAt.Hour,
+                p.CreatedAt.Minute
+            })
+            .ToList()
+            .ForEach(g =>
+            {
+                var label = new DateTime(g.Key.Year, g.Key.Month, g.Key.Day, g.Key.Hour, g.Key.Minute, 0);
+                var value = g.Average(p => p.Value);
+                result.Labels.Add(label);
+                result.Values.Add(value);
+            });
+
+        return result;
+    }
+
+    public async Task<WineMaterialBatchGrapeSortPhaseDetailsResult> GetPhaseDetailsByIdAsync(string phaseId, CancellationToken cancellationToken = default)
+    {
+        var source = await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(phaseId, cancellationToken);
+        
+        if (source == null)
+            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhase), nameof(phaseId));
+        
+        var result = _mapper.Map<WineMaterialBatchGrapeSortPhase, WineMaterialBatchGrapeSortPhaseDetailsResult>(source);
+        
+        return result;
+    }
 
     public async Task<WineMaterialBatchResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
@@ -70,6 +262,8 @@ public class WineMaterialBatchService : IWineMaterialBatchService
             throw new NotFoundException(nameof(WineMaterialBatch), nameof(id));
 
         var result = _mapper.Map<WineMaterialBatch, WineMaterialBatchResult>(source);
+        
+        result.Phases = result.Phases.OrderBy(x => x.Phase.Order).ToList();
 
         return result;
     }
@@ -99,7 +293,7 @@ public class WineMaterialBatchService : IWineMaterialBatchService
         // if (activePhase != null)
         // {
         //     result.ActivePhase = _mapper.Map<WineMaterialBatchGrapeSortPhase, WineMaterialBatchGrapeSortPhaseResult>(activePhase);
-        //     result.ParametersReadings = activePhase.Parameters.Select(p =>
+        //     result.ParametersReadings = activePhase.ParametersDetails.Select(p =>
         //         {
         //             var readingsResult = new WineMaterialBatchProcessPhaseReadingsResult
         //             {
@@ -113,6 +307,8 @@ public class WineMaterialBatchService : IWineMaterialBatchService
         //         .ToList();
         // }
 
+        result.Phases = result.Phases.OrderBy(x => x.Phase.Order).ToList();
+        
         return result;
     }
 
@@ -229,6 +425,37 @@ public class WineMaterialBatchService : IWineMaterialBatchService
         if (wineMaterialBatchToDelete == null)
             throw new NotFoundException(nameof(WineMaterialBatch), nameof(id));
         
+        if(wineMaterialBatchToDelete.Phases.Any(x => x.IsActive))
+            throw new ValidationException("Cannot delete wine material batch that has active phase");
+        
+        // TODO: Add cascade delete
+        foreach (var wineMaterialBatchGrapeSortPhase in wineMaterialBatchToDelete.Phases)
+        {
+            if (wineMaterialBatchGrapeSortPhase.Parameters?.Any() == true)
+            {
+                foreach (var wineMaterialBatchGrapeSortPhaseParameter in wineMaterialBatchGrapeSortPhase.Parameters)
+                {
+                    if (wineMaterialBatchGrapeSortPhaseParameter.Values?.Any() == true)
+                    {
+                        _unitOfWork.WineMaterialBatchGrapeSortPhaseParameterValues.RemoveRange(wineMaterialBatchGrapeSortPhaseParameter.Values);
+                    }
+
+                    if (wineMaterialBatchGrapeSortPhaseParameter.Sensors?.Any() == true)
+                    {
+                        foreach (var processPhaseParameterSensor in wineMaterialBatchGrapeSortPhaseParameter.Sensors)
+                        {
+                            processPhaseParameterSensor.WineMaterialBatchGrapeSortPhaseParameter = null;
+                            processPhaseParameterSensor.WineMaterialBatchGrapeSortPhaseParameterId = null;
+                            _unitOfWork.ProcessPhaseParameterSensors.Update(processPhaseParameterSensor);
+                        }
+                    }
+                }
+                
+                _unitOfWork.WineMaterialBatchGrapeSortPhaseParameters.RemoveRange(wineMaterialBatchGrapeSortPhase.Parameters);
+            }
+        }
+        
+        _unitOfWork.WineMaterialBatchGrapeSortPhases.RemoveRange(wineMaterialBatchToDelete.Phases);
         _unitOfWork.WineMaterialBatches.Remove(wineMaterialBatchToDelete);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }

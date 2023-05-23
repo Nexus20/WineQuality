@@ -128,4 +128,19 @@
     <data name="GoodQualityWhine" xml:space="preserve">
         <value>Good</value>
     </data>
+    <data name="DeviceStatus_0" xml:space="preserve">
+        <value>Created</value>
+    </data>
+    <data name="DeviceStatus_1000" xml:space="preserve">
+        <value>Ready</value>
+    </data>
+    <data name="DeviceStatus_2000" xml:space="preserve">
+        <value>Standards updated</value>
+    </data>
+    <data name="DeviceStatus_3000" xml:space="preserve">
+        <value>Working</value>
+    </data>
+    <data name="DeviceStatus_4000" xml:space="preserve">
+        <value>Stopped</value>
+    </data>
 </root>

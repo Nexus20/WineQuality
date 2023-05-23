@@ -30,6 +30,7 @@ public class GrapeSortProfile : Profile
             }));
 
         CreateMap<GrapeSortPhaseForecastModel, GrapeSortPhaseForecastModelResult>()
-            .ForMember(d => d.ModelUri, o => o.MapFrom(s => s.ForecastingModelFileReference.Uri));
+            .ForMember(d => d.ModelUri, o => o.MapFrom(s => s.ForecastingModelFileReference.Uri))
+            .ForMember(d => d.DatasetInfo, o => o.MapFrom(s => s.Dataset));
     }
 }

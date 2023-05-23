@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using WineQuality.API.Infrastructure;
+using WineQuality.Application.Interfaces.Infrastructure;
 
 namespace WineQuality.API;
 
@@ -107,6 +109,8 @@ public static class ApiLayerServicesRegistration
                         .GetBytes(jwtSettings.GetSection("securityKey").Value))
                 };
             });
+
+        services.AddSingleton<IInternalCommunicator, SignalRInternalCommunicator>();
 
         return services;
     }

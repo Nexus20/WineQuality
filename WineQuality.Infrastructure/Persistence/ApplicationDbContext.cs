@@ -27,6 +27,7 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, string, 
     public DbSet<GrapeSortPhaseDataset> GrapeSortPhaseDatasets { get; set; }
     public DbSet<GrapeSortProcessPhaseParameterStandard> GrapeSortProcessPhaseParameterStandards { get; set; }
     public DbSet<ProcessPhaseParameterSensor> ProcessPhaseParameterSensors { get; set; }
+    public DbSet<QualityPrediction> QualityPredictions { get; set; }
 
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {

@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
 using WineQuality.Application.Exceptions;
+using WineQuality.Application.Helpers.Expressions;
 using WineQuality.Application.Interfaces.IoT;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
@@ -118,36 +119,39 @@ public class ProcessPhaseParameterSensorService : IProcessPhaseParameterSensorSe
         return result;
     }
 
-    public async Task AssignDeviceToWineMaterialBatchAsync(AssignDeviceToWineMaterialBatchRequest request,
+    public async Task AssignDeviceToWineMaterialBatchAsync(AssignDevicesToWineMaterialBatchRequest request,
         CancellationToken cancellationToken = default)
     {
-        var sensor = await _unitOfWork.ProcessPhaseParameterSensors.GetByIdAsync(request.DeviceId, cancellationToken);
-
-        if (sensor == null)
-            throw new NotFoundException(nameof(ProcessPhaseParameterSensor), nameof(request.DeviceId));
-
-        var wineMaterialBatchGrapeSortPhaseParameter =
-            await _unitOfWork.WineMaterialBatchGrapeSortPhaseParameters.GetByIdAsync(
-                request.WineMaterialBatchGrapeSortPhaseParameterId, cancellationToken);
+        var sensors =
+            await _unitOfWork.ProcessPhaseParameterSensors.GetAsync(x => request.SensorsIds.Contains(x.Id),
+                cancellationToken);
         
-        if(wineMaterialBatchGrapeSortPhaseParameter == null)
-            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhaseParameter), nameof(request.WineMaterialBatchGrapeSortPhaseParameterId));
-
-        sensor.WineMaterialBatchGrapeSortPhaseParameter = wineMaterialBatchGrapeSortPhaseParameter;
-        sensor.WineMaterialBatchGrapeSortPhaseParameterId = request.WineMaterialBatchGrapeSortPhaseParameterId;
+        if(sensors.Count != request.SensorsIds.Length)
+            throw new ValidationException("Some of the sensors does not exist");
         
-        var grapeSortPhaseId = sensor.WineMaterialBatchGrapeSortPhaseParameter
-            .WineMaterialBatchGrapeSortPhase.GrapeSortPhaseId;
+        var wineMaterialBatchGrapeSortPhase = await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(request.WineMaterialBatchGrapeSortPhaseId, cancellationToken);
 
-        var standard = await _unitOfWork.GrapeSortProcessPhaseParameterStandards.FirstOrDefaultAsync(x =>
-            x.PhaseParameterId == sensor.PhaseParameterId && x.GrapeSortPhaseId == grapeSortPhaseId, cancellationToken);
-
-        if (standard != null)
-        {
-            await _ioTDeviceService.SendStandardsUpdateMessageAsync(sensor, standard, cancellationToken);
+        if (wineMaterialBatchGrapeSortPhase == null){
+            throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhase), nameof(request.WineMaterialBatchGrapeSortPhaseId));
         }
         
-        _unitOfWork.ProcessPhaseParameterSensors.Update(sensor);
+        foreach (var sensor in sensors)
+        {
+            var wineMaterialBatchGrapeSortPhaseParameter = wineMaterialBatchGrapeSortPhase.Parameters.Single(x => x.PhaseParameterId == sensor.PhaseParameterId);
+            sensor.WineMaterialBatchGrapeSortPhaseParameter = wineMaterialBatchGrapeSortPhaseParameter;
+            sensor.WineMaterialBatchGrapeSortPhaseParameterId = wineMaterialBatchGrapeSortPhaseParameter.Id;
+            
+            var standard = await _unitOfWork.GrapeSortProcessPhaseParameterStandards.FirstOrDefaultAsync(x =>
+                x.PhaseParameterId == sensor.PhaseParameterId && x.GrapeSortPhaseId == wineMaterialBatchGrapeSortPhase.GrapeSortPhaseId, cancellationToken);
+
+            if (standard != null)
+            {
+                await _ioTDeviceService.SendStandardsUpdateMessageAsync(sensor, standard, cancellationToken);
+            }
+        
+            _unitOfWork.ProcessPhaseParameterSensors.Update(sensor);
+        }
+        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
@@ -219,7 +223,11 @@ public class ProcessPhaseParameterSensorService : IProcessPhaseParameterSensorSe
     {
         Expression<Func<ProcessPhaseParameterSensor, bool>>? predicate = null;
 
-        // TODO: Add some code
+        if (!string.IsNullOrWhiteSpace(request.PhaseId))
+        {
+            Expression<Func<ProcessPhaseParameterSensor, bool>> phasePredicate = x => x.PhaseParameter.PhaseId == request.PhaseId;
+            predicate = ExpressionsHelper.And(predicate, phasePredicate);
+        }
         
         return predicate;
     }

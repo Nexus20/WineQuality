@@ -6,17 +6,29 @@ using WineQuality.Application.Models.Results.Auth;
 
 namespace WineQuality.API.Controllers;
 
+/// <summary>
+/// 
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
     private readonly ISignInService _signInService;
 
+    /// <summary>
+    /// Preferable DI constructor.
+    /// </summary>
+    /// <param name="signInService"></param>
     public AuthController(ISignInService signInService)
     {
         _signInService = signInService;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("[action]")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(LoginResult), StatusCodes.Status200OK)]

@@ -69,7 +69,21 @@ public class WineMaterialBatchController : ControllerBase
         
         return Ok(result);
     }
-    
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="phaseId"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpGet("phases/{phaseId}/details")]
+    public async Task<IActionResult> GetPhaseDetails(string phaseId, CancellationToken cancellationToken)
+    {
+        var result = await _wineMaterialBatchService.GetPhaseDetailsByIdAsync(phaseId, cancellationToken);
+        
+        return Ok(result);
+    }
+
     /// <summary>
     /// 
     /// </summary>
@@ -126,10 +140,23 @@ public class WineMaterialBatchController : ControllerBase
         return StatusCode(StatusCodes.Status201Created);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet("{id}/start_allowed")]
     public async Task<IActionResult> CheckIfProcessStartAllowedAsync(string id, CancellationToken cancellationToken)
     {
         var result = await _wineMaterialBatchService.CheckIfProcessStartAllowedAsync(id, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("phases/{phaseId}/start_allowed")]
+    public async Task<IActionResult> CheckIfPhaseStartAllowedAsync(string phaseId, CancellationToken cancellationToken)
+    {
+        var result = await _wineMaterialBatchService.CheckIfPhaseStartAllowedAsync(phaseId, cancellationToken);
         return Ok(result);
     }
 
@@ -179,5 +206,19 @@ public class WineMaterialBatchController : ControllerBase
         await _wineMaterialBatchService.UpdatePhasesTermsAsync(request);
         
         return NoContent();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpGet("phases/parameters/get_chart_data")]
+    public async Task<IActionResult> GetPhaseParametersChart([FromQuery] GetWineMaterialBatchPhaseParameterChartDataRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _wineMaterialBatchService.GetPhaseParametersChartAsync(request, cancellationToken);
+        
+        return Ok(result);
     }
 }

@@ -7,19 +7,30 @@ using WineQuality.Application.Models.Requests.Users;
 
 namespace WineQuality.API.Controllers;
 
+/// <summary>
+/// Controller with user management related endpoints.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = CustomRoles.Admin)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = $"{CustomRoles.Admin}, {CustomRoles.SuperAdmin}")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
-        
-    // GET: api/User
+    
+    /// <summary>
+    /// Preferable DI constructor.
+    /// </summary>
+    /// <param name="userService"></param>
     public UserController(IUserService userService)
     {
         _userService = userService;
     }
-
+    
+    /// <summary>
+    /// Get all users.
+    /// </summary>
+    /// <param name="cancellationToken">For operation cancellation.</param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
@@ -32,6 +43,12 @@ public class UserController : ControllerBase
     }
 
     // GET: api/User/5
+    /// <summary>
+    /// Get user by id.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> Get(string id, CancellationToken cancellationToken)
     {
@@ -41,6 +58,11 @@ public class UserController : ControllerBase
     }
 
     // POST: api/User
+    /// <summary>
+    /// Create new user.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] CreateUserRequest request)
     {
@@ -50,14 +72,32 @@ public class UserController : ControllerBase
     }
 
     // PUT: api/User/5
+    /// <summary>
+    /// Update user by id.
+    /// </summary>
+    /// <param name="id">User id.</param>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public async Task<IActionResult> Put(string id, [FromBody] UpdateUserRequest request)
     {
+        if (id != request.Id)
+            return BadRequest();
+        
+        var result = await _userService.UpdateAsync(request);
+        return Ok(result);
     }
 
     // DELETE: api/User/5
+    /// <summary>
+    /// Delete user by id.
+    /// </summary>
+    /// <param name="id">User id.</param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public async Task<IActionResult> Delete(string id)
     {
+        await _userService.DeleteAsync(id);
+        return NoContent();
     }
 }

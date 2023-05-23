@@ -8,6 +8,4 @@ public class ProcessPhaseResult : BaseResult
     public string Name { get; set; } = null!;
     // public virtual ProcessPhaseResult? NextPhase {get; set;}
     // public virtual ProcessPhaseResult? PreviousPhase {get; set;}
-    public virtual List<ProcessParameterResult>? Parameters { get; set; }
-    public int Order { get; set; }
 }

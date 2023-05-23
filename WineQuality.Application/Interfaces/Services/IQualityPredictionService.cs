@@ -11,4 +11,6 @@ public interface IQualityPredictionService
         CancellationToken cancellationToken = default);
 
     Task<PredictionDetailsResult> PredictQualityAsync(PredictQualityRequest request, CancellationToken cancellationToken = default);
+    Task DeleteGrapeSortPhaseForecastModelAsync(string id, CancellationToken cancellationToken = default);
+    Task<List<PredictionDetailsResult>> GetGrapeSortPhasePredictionsHistoryAsync(string grapeSortPhaseId, CancellationToken cancellationToken);
 }

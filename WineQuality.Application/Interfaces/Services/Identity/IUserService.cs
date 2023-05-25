@@ -10,4 +10,5 @@ public interface IUserService
     Task<UserResult> CreateAsync(CreateUserRequest request, CancellationToken cancellationToken = default);
     Task<UserResult> UpdateAsync(UpdateUserRequest request, CancellationToken cancellationToken = default);
     Task DeleteAsync(string id, CancellationToken cancellationToken = default);
+    Task SetLanguageAsync(string userId, SetLanguageRequest request, CancellationToken cancellationToken = default);
 }

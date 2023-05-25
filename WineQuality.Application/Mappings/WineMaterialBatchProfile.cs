@@ -47,7 +47,8 @@ public class WineMaterialBatchProfile : Profile
 
         CreateMap<WineMaterialBatchGrapeSortPhaseParameter, WineMaterialBatchGrapeSortPhaseParameterDetailsResult>()
             .ForMember(d => d.Parameter, o => o.MapFrom(s => s.PhaseParameter.Parameter))
-            .ForMember(d => d.Sensors, o => o.MapFrom(s => s.Sensors));
+            .ForMember(d => d.Sensors, o => o.MapFrom(s => s.Sensors))
+            .ForMember(d => d.Standard, o => o.MapFrom(s => s.WineMaterialBatchGrapeSortPhase.GrapeSortPhase.GrapeSortProcessPhaseParameterStandards.Single(std => std.PhaseParameterId == s.PhaseParameterId)));
 
         CreateMap<WineMaterialBatchGrapeSortPhase, WineMaterialBatchGrapeSortPhaseDetailsResult>()
             .ForMember(d => d.Phase,

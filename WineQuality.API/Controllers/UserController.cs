@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -98,6 +99,23 @@ public class UserController : ControllerBase
     public async Task<IActionResult> Delete(string id)
     {
         await _userService.DeleteAsync(id);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPatch("{id}/set_language")]
+    public async Task<IActionResult> SetLanguage([FromBody] SetLanguageRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (string.IsNullOrWhiteSpace(userId))
+            return Unauthorized();
+        
+        await _userService.SetLanguageAsync(userId, request);
         return NoContent();
     }
 }

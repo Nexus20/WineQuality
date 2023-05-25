@@ -63,6 +63,7 @@ public class ProfileController : ControllerBase
             Id = userId,
             FirstName = request.FirstName,
             LastName = request.LastName,
+            Phone = request.Phone
         };
         
         var result = await _userService.UpdateAsync(updateUserRequest, cancellationToken);

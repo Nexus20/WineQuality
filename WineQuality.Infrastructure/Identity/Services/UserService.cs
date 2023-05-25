@@ -94,7 +94,24 @@ public class UserService : IUserService
 
         if (userToDelete == null)
             throw new NotFoundException(nameof(AppUser), nameof(id));
+        
+        if(userToDelete.UserName == "root@wine-quality.com")
+            throw new ValidationException("You can't delete root user");
 
         await _userManager.DeleteAsync(userToDelete);
+    }
+
+    public async Task SetLanguageAsync(string userId, SetLanguageRequest request, CancellationToken cancellationToken = default)
+    {
+        var userToUpdate = await _userManager.FindByIdAsync(userId);
+
+        if (userToUpdate == null)
+            throw new NotFoundException(nameof(AppUser), nameof(userId));
+        
+        if(userToUpdate.SelectedCulture == request.NewLanguage)
+            return;
+        
+        userToUpdate.SelectedCulture = request.NewLanguage;
+        await _userManager.UpdateAsync(userToUpdate);
     }
 }

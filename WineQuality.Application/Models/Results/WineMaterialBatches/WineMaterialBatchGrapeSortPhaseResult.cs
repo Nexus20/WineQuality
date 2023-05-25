@@ -1,6 +1,7 @@
 ﻿using System.Reflection.Metadata;
 using WineQuality.Application.Models.Results.Abstract;
 using WineQuality.Application.Models.Results.GrapeSorts;
+using WineQuality.Application.Models.Results.GrapeSorts.Standards;
 using WineQuality.Application.Models.Results.ProcessParameters;
 using WineQuality.Application.Models.Results.ProcessPhaseParameterSensors;
 
@@ -29,6 +30,7 @@ public class WineMaterialBatchGrapeSortPhaseParameterDetailsResult : BaseResult
 {
     public ProcessParameterResult Parameter { get; set; }
     public List<ProcessPhaseParameterSensorResult>? Sensors { get; set; }
+    public GrapeSortProcessPhaseParameterStandardResult Standard { get; set; }
 }
 
 public class WineMaterialBatchGrapeSortPhaseParameterResult : BaseResult

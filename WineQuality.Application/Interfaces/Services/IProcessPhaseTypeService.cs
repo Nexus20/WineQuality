@@ -1,5 +1,5 @@
 ﻿using WineQuality.Application.Models.Requests.ProcessPhaseTypes;
-using WineQuality.Application.Models.Results.ProcessPhaseTypes;
+using WineQuality.Application.Models.Results.ProcessPhases;
 
 namespace WineQuality.Application.Interfaces.Services;
 

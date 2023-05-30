@@ -67,4 +67,41 @@ public class GrapeSortStandardService : IGrapeSortStandardService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<GrapeSortProcessPhaseParameterStandardResult> GetGrapeSortPhaseParameterStandardByIdAsync(string standardId, CancellationToken cancellationToken = default)
+    {
+        var standard = await _unitOfWork.GrapeSortProcessPhaseParameterStandards.GetByIdAsync(standardId, cancellationToken);
+        
+        if (standard == null)
+            throw new NotFoundException(nameof(GrapeSortProcessPhaseParameterStandard), nameof(standardId));
+        
+        var result = _mapper.Map<GrapeSortProcessPhaseParameterStandard, GrapeSortProcessPhaseParameterStandardResult>(standard);
+        return result;
+    }
+
+    public async Task UpdateGrapeSortPhaseParameterStandardAsync(UpdateGrapeSortProcessPhaseParameterStandardsRequestPart request,
+        CancellationToken cancellationToken = default)
+    {
+        var standardToUpdate = await _unitOfWork.GrapeSortProcessPhaseParameterStandards.GetByIdAsync(request.StandardId, cancellationToken);
+        
+        if (standardToUpdate == null)
+            throw new NotFoundException(nameof(GrapeSortProcessPhaseParameterStandard), nameof(request.StandardId));
+        
+        standardToUpdate.UpperBound = request.UpperBound;
+        standardToUpdate.LowerBound = request.LowerBound;
+        
+        _unitOfWork.GrapeSortProcessPhaseParameterStandards.Update(standardToUpdate);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteGrapeSortPhaseParameterStandardByIdAsync(string standardId, CancellationToken cancellationToken = default)
+    {
+        var standardToDelete = await _unitOfWork.GrapeSortProcessPhaseParameterStandards.GetByIdAsync(standardId, cancellationToken);
+        
+        if (standardToDelete == null)
+            throw new NotFoundException(nameof(GrapeSortProcessPhaseParameterStandard), nameof(standardId));
+
+        _unitOfWork.GrapeSortProcessPhaseParameterStandards.Remove(standardToDelete);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+    }
 }

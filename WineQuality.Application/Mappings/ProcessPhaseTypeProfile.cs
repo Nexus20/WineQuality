@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using WineQuality.Application.Models.Requests.ProcessPhaseTypes;
-using WineQuality.Application.Models.Results.ProcessPhaseTypes;
+using WineQuality.Application.Models.Results.ProcessPhases;
 using WineQuality.Domain.Entities;
 
 namespace WineQuality.Application.Mappings;
@@ -13,7 +13,7 @@ public class ProcessPhaseProfile : Profile
         CreateMap<UpdateProcessPhaseRequest, ProcessPhase>();
         CreateMap<ProcessPhase, ProcessPhaseResult>();
         
-        CreateMap<ProcessPhase, ProcessPhaseDetailResult>()
+        CreateMap<ProcessPhase, ProcessPhaseDetailsResult>()
             .ForMember(d => d.Parameters,
                 o => o.MapFrom(s => (s.Parameters ?? new List<ProcessPhaseParameter>()).Select(p => p.Parameter))).MaxDepth(2);
     }

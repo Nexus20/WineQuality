@@ -130,6 +130,33 @@ public class GrapeSortController : ControllerBase
         
         return StatusCode(StatusCodes.Status201Created, result);
     }
+    
+    [HttpGet("standards/{standardId}")]
+    public async Task<IActionResult> GetStandardById(string standardId, CancellationToken cancellationToken)
+    {
+        var result = await _grapeSortStandardService.GetGrapeSortPhaseParameterStandardByIdAsync(standardId, cancellationToken);
+        
+        return Ok(result);
+    }
+    
+    [HttpPut("standards/{standardId}/edit")]
+    public async Task<IActionResult> UpdateStandardById(string standardId, [FromBody]UpdateGrapeSortProcessPhaseParameterStandardsRequestPart request, CancellationToken cancellationToken)
+    {
+        if (standardId != request.StandardId)
+            return BadRequest();
+        
+        await _grapeSortStandardService.UpdateGrapeSortPhaseParameterStandardAsync(request, cancellationToken);
+        
+        return NoContent();
+    }
+    
+    [HttpDelete("standards/{standardId}/delete")]
+    public async Task<IActionResult> DeleteStandardById(string standardId, CancellationToken cancellationToken)
+    {
+        await _grapeSortStandardService.DeleteGrapeSortPhaseParameterStandardByIdAsync(standardId, cancellationToken);
+        
+        return NoContent();
+    }
 
     /// <summary>
     /// 

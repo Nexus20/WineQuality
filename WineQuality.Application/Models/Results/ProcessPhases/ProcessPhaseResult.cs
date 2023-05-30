@@ -1,7 +1,6 @@
 ﻿using WineQuality.Application.Models.Results.Abstract;
-using WineQuality.Application.Models.Results.ProcessParameters;
 
-namespace WineQuality.Application.Models.Results.ProcessPhaseTypes;
+namespace WineQuality.Application.Models.Results.ProcessPhases;
 
 public class ProcessPhaseResult : BaseResult
 {

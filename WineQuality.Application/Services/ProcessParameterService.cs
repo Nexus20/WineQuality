@@ -21,14 +21,14 @@ public class ProcessParameterService : IProcessParameterService
         _mapper = mapper;
     }
 
-    public async Task<ProcessParameterResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<ProcessParameterDetailsResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         var source = await _unitOfWork.ProcessParameters.GetByIdAsync(id, cancellationToken);
 
         if (source == null)
             throw new NotFoundException(nameof(ProcessParameter), nameof(id));
 
-        var result = _mapper.Map<ProcessParameter, ProcessParameterResult>(source);
+        var result = _mapper.Map<ProcessParameter, ProcessParameterDetailsResult>(source);
 
         return result;
     }

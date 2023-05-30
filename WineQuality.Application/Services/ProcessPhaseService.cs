@@ -4,7 +4,7 @@ using WineQuality.Application.Exceptions;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.ProcessPhaseTypes;
-using WineQuality.Application.Models.Results.ProcessPhaseTypes;
+using WineQuality.Application.Models.Results.ProcessPhases;
 using WineQuality.Domain.Entities;
 
 namespace WineQuality.Application.Services;
@@ -27,7 +27,7 @@ public class ProcessPhaseService : IProcessPhaseService
         if (source == null)
             throw new NotFoundException(nameof(ProcessPhase), nameof(id));
 
-        var result = _mapper.Map<ProcessPhase, ProcessPhaseDetailResult>(source);
+        var result = _mapper.Map<ProcessPhase, ProcessPhaseDetailsResult>(source);
 
         return result;
     }

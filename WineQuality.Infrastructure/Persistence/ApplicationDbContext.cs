@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using WineQuality.Domain.Entities;
 using WineQuality.Domain.Entities.Abstract;
 using WineQuality.Infrastructure.Identity;
@@ -35,6 +36,12 @@ public class ApplicationDbContext : IdentityDbContext<AppUser, AppRole, string, 
         {
             Database.Migrate();
         }
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored, CoreEventId.NavigationBaseIncluded));
+        base.OnConfiguring(optionsBuilder);
     }
 
     public override int SaveChanges()

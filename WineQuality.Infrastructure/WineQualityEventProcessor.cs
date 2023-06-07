@@ -121,8 +121,12 @@ public class WineQualityEventProcessor
                 
                 await _internalCommunicator.SendReadingsMessageAsync(new ReadingsMessage()
                 {
+                    WineMaterialBatchId = parameter.WineMaterialBatchGrapeSortPhase.WineMaterialBatchId,
                     DeviceId = deviceId,
-                    Value = valueToSend
+                    Value = valueToSend,
+                    ParameterId = valueToSend.PhaseParameter.Id,
+                    ParameterName = parameter?.PhaseParameter.Parameter.Name,
+                    CreatedAt = DateTime.UtcNow
                 });
             }
         }

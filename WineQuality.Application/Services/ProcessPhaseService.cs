@@ -5,6 +5,8 @@ using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.ProcessPhaseTypes;
 using WineQuality.Application.Models.Results.ProcessPhases;
+using WineQuality.Application.Specifications.Abstract;
+using WineQuality.Application.Specifications.ProcessPhases;
 using WineQuality.Domain.Entities;
 
 namespace WineQuality.Application.Services;
@@ -22,7 +24,7 @@ public class ProcessPhaseService : IProcessPhaseService
 
     public async Task<ProcessPhaseResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        var source = await _unitOfWork.ProcessPhases.GetByIdAsync(id, cancellationToken);
+        var source = await _unitOfWork.ProcessPhases.GetByIdAsync(id, new ProcessPhaseIncludeParametersSpecification(), cancellationToken);
 
         if (source == null)
             throw new NotFoundException(nameof(ProcessPhase), nameof(id));

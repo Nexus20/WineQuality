@@ -5,6 +5,8 @@ using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.GrapeSorts;
 using WineQuality.Application.Models.Results.GrapeSorts;
+using WineQuality.Application.Specifications.Abstract;
+using WineQuality.Application.Specifications.GrapeSorts;
 using WineQuality.Domain.Entities;
 
 namespace WineQuality.Application.Services;
@@ -22,7 +24,7 @@ public class GrapeSortService : IGrapeSortService
 
     public async Task<GrapeSortDetailsResult> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        var source = await _unitOfWork.GrapeSorts.GetByIdAsync(id, cancellationToken);
+        var source = await _unitOfWork.GrapeSorts.GetByIdAsync(id, new GrapeSortIncludeDetailsSpecification(), cancellationToken);
 
         if (source == null)
             throw new NotFoundException(nameof(GrapeSort), nameof(id));

@@ -30,7 +30,7 @@ public class WineMaterialBatchGrapeSortPhaseParameterDetailsResult : BaseResult
 {
     public ProcessParameterResult Parameter { get; set; }
     public List<ProcessPhaseParameterSensorResult>? Sensors { get; set; }
-    public GrapeSortProcessPhaseParameterStandardResult Standard { get; set; }
+    public GrapeSortProcessPhaseParameterStandardResult? Standard { get; set; }
 }
 
 public class WineMaterialBatchGrapeSortPhaseParameterResult : BaseResult

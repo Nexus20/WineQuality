@@ -1,11 +1,14 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
 using WineQuality.Application.Exceptions;
+using WineQuality.Application.Helpers.Expressions;
 using WineQuality.Application.Interfaces.IoT;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.WineMaterialBatches;
 using WineQuality.Application.Models.Results.WineMaterialBatches;
+using WineQuality.Application.Specifications.Abstract;
+using WineQuality.Application.Specifications.WineMaterialBatches;
 using WineQuality.Domain.Entities;
 using WineQuality.Domain.Enums;
 
@@ -43,7 +46,7 @@ public class WineMaterialBatchService : IWineMaterialBatchService
             result.StartNotAllowedReasons.Add("Process can't be started because phases terms are not set");
         }
 
-        var firstPhase = wineMaterialBatch.Phases.MinBy(x => x.StartDate);
+        var firstPhase = wineMaterialBatch.Phases.MinBy(x => x.GrapeSortPhase.Order);
         
         var phaseSensorsNotReady = firstPhase.Parameters.Any(p =>
             p.Sensors == null 
@@ -244,7 +247,7 @@ public class WineMaterialBatchService : IWineMaterialBatchService
 
     public async Task<WineMaterialBatchGrapeSortPhaseDetailsResult> GetPhaseDetailsByIdAsync(string phaseId, CancellationToken cancellationToken = default)
     {
-        var source = await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(phaseId, cancellationToken);
+        var source = await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(phaseId, new WineMaterialBatchGrapeSortPhaseIncludeDetailsSpecification(), cancellationToken);
         
         if (source == null)
             throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhase), nameof(phaseId));
@@ -270,42 +273,12 @@ public class WineMaterialBatchService : IWineMaterialBatchService
 
     public async Task<WineMaterialBatchDetailsResult> GetDetailsByIdAsync(string id, CancellationToken cancellationToken = default)
     {
-        var source = await _unitOfWork.WineMaterialBatches.GetByIdAsync(id, cancellationToken);
+        var source = await _unitOfWork.WineMaterialBatches.GetByIdAsync(id, new WineMaterialBatchIncludeDetailsSpecification(), cancellationToken);
 
         if (source == null)
             throw new NotFoundException(nameof(WineMaterialBatch), nameof(id));
 
         var result = _mapper.Map<WineMaterialBatch, WineMaterialBatchDetailsResult>(source);
-        
-        // var result = new WineMaterialBatchDetailsResult()
-        // {
-        //     Id = source.Id,
-        //     Name = source.Name,
-        //     CreatedAt = source.CreatedAt,
-        //     UpdatedAt = source.UpdatedAt,
-        //     HarvestDate = source.HarvestDate,
-        //     HarvestLocation = source.HarvestLocation,
-        //     GrapeSort = _mapper.Map<GrapeSort, GrapeSortResult>(source.GrapeSort),
-        // };
-        //
-        // var activePhase = source.Phases.FirstOrDefault(p => p.IsActive);
-        //
-        // if (activePhase != null)
-        // {
-        //     result.ActivePhase = _mapper.Map<WineMaterialBatchGrapeSortPhase, WineMaterialBatchGrapeSortPhaseResult>(activePhase);
-        //     result.ParametersReadings = activePhase.ParametersDetails.Select(p =>
-        //         {
-        //             var readingsResult = new WineMaterialBatchProcessPhaseReadingsResult
-        //             {
-        //                 Value = p.Values.MaxBy(v => v.CreatedAt).Value,
-        //                 ParameterName = p.PhaseParameter.Parameter.Name,
-        //                 ParameterId = p.PhaseParameter.Parameter.Id
-        //             };
-        //
-        //             return readingsResult;
-        //         })
-        //         .ToList();
-        // }
 
         result.Phases = result.Phases.OrderBy(x => x.Phase.Order).ToList();
         
@@ -340,7 +313,11 @@ public class WineMaterialBatchService : IWineMaterialBatchService
     {
         var predicate = CreateFilterPredicate(request);
         
-        var source = await _unitOfWork.WineMaterialBatches.GetAsync(predicate, cancellationToken);
+        var filterSpecification = predicate == null
+            ? FilterSpecification<WineMaterialBatch>.Default
+            : new FilterSpecification<WineMaterialBatch>(predicate);
+        
+        var source = await _unitOfWork.WineMaterialBatches.GetBySpecificationAsync(filterSpecification, cancellationToken: cancellationToken);
 
         if (source == null || !source.Any())
             return new List<WineMaterialBatchResult>();
@@ -514,7 +491,8 @@ public class WineMaterialBatchService : IWineMaterialBatchService
             throw new ValidationException(
                 $"There are no phases set for wine material batch with id {request.WineMaterialBatchId}");
 
-        var phase = wineMaterialBatchGrapeSortPhases.SingleOrDefault(x => x.Id == request.WineMaterialBatchGrapeSortPhaseId);
+        var phase = await _unitOfWork.WineMaterialBatchGrapeSortPhases.GetByIdAsync(request.WineMaterialBatchGrapeSortPhaseId, new WineMaterialBatchGrapeSortPhaseIncludeDetailsSpecification(), cancellationToken);
+        // var phase = wineMaterialBatchGrapeSortPhases.SingleOrDefault(x => x.Id == request.WineMaterialBatchGrapeSortPhaseId);
 
         if (phase == null)
             throw new NotFoundException(nameof(WineMaterialBatchGrapeSortPhase),
@@ -582,7 +560,11 @@ public class WineMaterialBatchService : IWineMaterialBatchService
     {
         Expression<Func<WineMaterialBatch, bool>>? predicate = null;
 
-        // TODO: Add some code
+        if (!string.IsNullOrWhiteSpace(request.GrapeSortId))
+        {
+            Expression<Func<WineMaterialBatch, bool>> grapeSortPredicate = x => x.GrapeSortId == request.GrapeSortId;
+            predicate = ExpressionsHelper.And(predicate, grapeSortPredicate);
+        }
         
         return predicate;
     }

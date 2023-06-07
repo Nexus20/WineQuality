@@ -4,6 +4,7 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Models.Results.Abstract;
+using WineQuality.Application.Specifications.Abstract;
 using WineQuality.Domain.Entities.Abstract;
 using WineQuality.Infrastructure.Persistence;
 
@@ -18,6 +19,38 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
     {
         DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         Mapper = mapper;
+    }
+
+    public Task<List<TEntity>> GetBySpecificationAsync(IFilterSpecification<TEntity>? filterSpecification = null,
+        IIncludeSpecification<TEntity>? includeSpecification = null, IOrderSpecification<TEntity>? orderSpecification = null,
+        CancellationToken cancellationToken = default)
+    {
+        var queryable = DbContext.Set<TEntity>().AsQueryable();
+        
+        if (filterSpecification != null)
+        {
+            queryable = queryable.Where(filterSpecification.Criteria);
+        }
+
+        if (includeSpecification != null)
+        {
+            foreach (var include in includeSpecification.Includes)
+            {
+                queryable = queryable.Include(include);
+            }
+        }
+
+        if (orderSpecification != null)
+        {
+            foreach (var order in orderSpecification.OrderBy)
+            {
+                queryable = order.SortDirection == SortDirection.Ascending 
+                    ? queryable.OrderBy(order.KeySelector)
+                    : queryable.OrderByDescending(order.KeySelector);
+            }
+        }
+
+        return queryable.ToListAsync(cancellationToken: cancellationToken);
     }
 
     public Task<List<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -39,6 +72,22 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
             return DbContext.Set<TEntity>().FirstOrDefaultAsync(cancellationToken: cancellationToken);
         
         return DbContext.Set<TEntity>().FirstOrDefaultAsync(predicate, cancellationToken: cancellationToken);
+    }
+
+    public Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>>? predicate, IIncludeSpecification<TEntity> includeSpecification,
+        CancellationToken cancellationToken = default)
+    {
+        var query = DbContext.Set<TEntity>().AsQueryable();
+        
+        foreach (var include in includeSpecification.Includes)
+        {
+            query = query.Include(include);
+        }
+
+        if (predicate == null)
+            return query.FirstOrDefaultAsync(cancellationToken: cancellationToken);
+
+        return query.FirstOrDefaultAsync(predicate, cancellationToken: cancellationToken);
     }
 
     public Task<List<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? predicate = null,
@@ -89,6 +138,19 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
     public virtual Task<TEntity?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         return DbContext.Set<TEntity>().SingleOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
+    }
+
+    public Task<TEntity?> GetByIdAsync(string id, IIncludeSpecification<TEntity> includeSpecification,
+        CancellationToken cancellationToken = default)
+    {
+        var query = DbContext.Set<TEntity>().AsQueryable();
+        
+        foreach (var include in includeSpecification.Includes)
+        {
+            query = query.Include(include);
+        }
+        
+        return query.SingleOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
     }
 
     public virtual Task<TResult?> GetByIdAsync<TResult>(string id, CancellationToken cancellationToken = default) where TResult : BaseResult

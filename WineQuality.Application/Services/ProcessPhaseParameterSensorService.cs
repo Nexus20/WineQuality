@@ -7,6 +7,8 @@ using WineQuality.Application.Interfaces.Persistence;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.ProcessPhaseParameterSensors;
 using WineQuality.Application.Models.Results.ProcessPhaseParameterSensors;
+using WineQuality.Application.Specifications.Abstract;
+using WineQuality.Application.Specifications.ProcessPhaseParameterSensors;
 using WineQuality.Domain.Entities;
 using WineQuality.Domain.Enums;
 
@@ -96,8 +98,12 @@ public class ProcessPhaseParameterSensorService : IProcessPhaseParameterSensorSe
     public async Task<List<ProcessPhaseParameterSensorResult>> GetAsync(GetProcessPhaseParameterSensorsRequest request, CancellationToken cancellationToken = default)
     {
         var predicate = CreateFilterPredicate(request);
+
+        var filterSpecification = predicate == null
+            ? FilterSpecification<ProcessPhaseParameterSensor>.Default
+            : new FilterSpecification<ProcessPhaseParameterSensor>(predicate);
         
-        var source = await _unitOfWork.ProcessPhaseParameterSensors.GetAsync(predicate, cancellationToken);
+        var source = await _unitOfWork.ProcessPhaseParameterSensors.GetBySpecificationAsync(filterSpecification, new SensorIncludeDetailsSpecification(), cancellationToken: cancellationToken);
 
         if (source == null || !source.Any())
             return new List<ProcessPhaseParameterSensorResult>();

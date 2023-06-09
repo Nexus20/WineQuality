@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WineQuality.Application.Exceptions;
 using WineQuality.Application.Interfaces.Services;
 using WineQuality.Application.Models.Requests.GrapeSorts;
 using WineQuality.Application.Models.Requests.GrapeSorts.Standards;

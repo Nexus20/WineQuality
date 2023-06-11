@@ -57,8 +57,6 @@ public class WineQualityEventProcessor
                 if (statusUpdateMessage.Status == DeviceStatus.Ready)
                 {
 
-                    // TODO: Handle wrong device id
-
                     if (device.WineMaterialBatchGrapeSortPhaseParameter != null)
                     {
                         var grapeSortPhaseId = device.WineMaterialBatchGrapeSortPhaseParameter
@@ -131,20 +129,16 @@ public class WineQualityEventProcessor
             }
         }
 
-
         Console.WriteLine($"Message received. Partition: {args.Partition.PartitionId} Data: '{message}'");
-
-        // Обработка сообщений в зависимости от их типов
-        // ...
 
         await args.UpdateCheckpointAsync(args.CancellationToken);
     }
 
-    public async Task OnProcessingErrorAsync(ProcessErrorEventArgs args)
+    public Task OnProcessingErrorAsync(ProcessErrorEventArgs args)
     {
         _logger.LogError("Error in operation \'{ArgsOperation}\': {ExceptionMessage}", args.Operation,
             args.Exception.Message);
         Console.WriteLine($"Error in operation '{args.Operation}': {args.Exception.Message}");
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 }

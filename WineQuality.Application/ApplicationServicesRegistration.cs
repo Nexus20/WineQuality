@@ -25,6 +25,7 @@ public static class ApplicationServicesRegistration
         services.AddScoped<IGrapeSortStandardService, GrapeSortStandardService>();
         services.AddScoped<IWineMaterialBatchService, WineMaterialBatchService>();
         services.AddScoped<IProcessPhaseParameterSensorService, ProcessPhaseParameterSensorService>();
+        services.AddScoped<ICultureService, CultureService>();
 
         services.AddHttpClient<IMachineLearningService, MachineLearningService>(c => 
             c.BaseAddress = new Uri(configuration["MachineLearningSettings:ServiceAddress"]));

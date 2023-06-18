@@ -35,8 +35,9 @@ public class WineMaterialBatchProfile : Profile
             .ForMember(d => d.Readings, o => o.MapFrom(s => s.Parameters));
 
         CreateMap<WineMaterialBatchGrapeSortPhaseParameter, WineMaterialBatchProcessPhaseReadingsResult>()
-            .ForMember(d => d.Value, o => o.MapFrom(s => s.Values == null ? -1.0 : s.Values.MaxBy(v => v.CreatedAt).Value))
-            .ForMember(d => d.CreatedAt, o => o.MapFrom(s => s.Values == null ? DateTime.MinValue : s.Values.MaxBy(v => v.CreatedAt).CreatedAt))
+            // .ForMember(d => d.Value, o => o.MapFrom(s => s.Values == null ? -1.0 : s.Values.MaxBy(v => v.CreatedAt).Value))
+            .ForMember(d => d.Value, o => o.MapFrom(s => s.Values == null ? -1.0 : s.Values.OrderByDescending(v => v.CreatedAt).FirstOrDefault()!.Value))
+            .ForMember(d => d.CreatedAt, o => o.MapFrom(s => s.Values == null ? DateTime.MinValue : s.Values.OrderByDescending(v => v.CreatedAt).FirstOrDefault()!.CreatedAt))
             .ForMember(d => d.ParameterId, o => o.MapFrom(s => s.PhaseParameter.Parameter.Id))
             .ForMember(d => d.ParameterName, o => o.MapFrom(s => s.PhaseParameter.Parameter.Name));
 

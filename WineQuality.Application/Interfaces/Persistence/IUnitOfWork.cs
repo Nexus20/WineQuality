@@ -20,6 +20,7 @@ public interface IUnitOfWork
     IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> WineMaterialBatchGrapeSortPhaseParameterValues { get; }
     IRepository<FileReference> FileReferences { get; }
     IRepository<QualityPrediction> QualityPredictions { get; }
+    IRepository<Culture> Cultures { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     int SaveChanges();
 }

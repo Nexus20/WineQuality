@@ -30,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<FileReference> FileReferences { get; }
     public IRepository<QualityPrediction> QualityPredictions { get; }
+    public IRepository<Culture> Cultures { get; set; }
 
     public UnitOfWork(ApplicationDbContext dbContext, IRepository<ProcessParameter> processParameters,
         IRepository<ProcessPhase> processPhases, IRepository<ProcessPhaseParameter> processPhaseParameters,
@@ -45,7 +46,7 @@ public class UnitOfWork : IUnitOfWork
         IRepository<WineMaterialBatchGrapeSortPhaseParameterValue> wineMaterialBatchGrapeSortPhaseParameterValues, 
         IRepository<WineMaterialBatchGrapeSortPhase> wineMaterialBatchGrapeSortPhases, 
         IRepository<FileReference> fileReferences, 
-        IRepository<QualityPrediction> qualityPredictions)
+        IRepository<QualityPrediction> qualityPredictions, IRepository<Culture> cultures)
     {
         _dbContext = dbContext;
         ProcessParameters = processParameters;
@@ -66,6 +67,7 @@ public class UnitOfWork : IUnitOfWork
         WineMaterialBatchGrapeSortPhases = wineMaterialBatchGrapeSortPhases;
         FileReferences = fileReferences;
         QualityPredictions = qualityPredictions;
+        Cultures = cultures;
     }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

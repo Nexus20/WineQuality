@@ -84,6 +84,30 @@ public class QualityPredictionService : IQualityPredictionService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<PredictionDetailsResult> GetPredictionDetailsAsync(string id, CancellationToken cancellationToken)
+    {
+        var prediction = await _unitOfWork.QualityPredictions.GetByIdAsync(id, cancellationToken);
+        
+        if(prediction == null)
+            throw new NotFoundException(nameof(QualityPrediction), nameof(id));
+        
+        var predictionDetailsResult = new PredictionDetailsResult()
+        {
+            Id = prediction.Id,
+            CreatedAt = prediction.CreatedAt,
+            UpdatedAt = prediction.UpdatedAt,
+            Quality = _stringLocalizer[QualityLocalizationConstants.QualityLocalizations[prediction.Prediction ? 1 : 0]]
+        };
+            
+        if(prediction.FileReference != null)
+            predictionDetailsResult.ExplanationUri = prediction.FileReference.Uri;
+
+        if (prediction is { PredictionExplanation: not null, ParametersValues: not null })
+            predictionDetailsResult.ExplanationItems = ParseQualityExplanation(prediction.PredictionExplanation, prediction.ParametersValues);
+            
+        return predictionDetailsResult;
+    }
+    
     public async Task<List<PredictionDetailsResult>> GetGrapeSortPhasePredictionsHistoryAsync(string grapeSortPhaseId,
         CancellationToken cancellationToken)
     {

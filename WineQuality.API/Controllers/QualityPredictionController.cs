@@ -43,6 +43,20 @@ public class QualityPredictionController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpGet("predictions/{id}")]
+    public async Task<IActionResult> GetPredictionDetails(string id, CancellationToken cancellationToken)
+    {
+        var prediction = await _qualityPredictionService.GetPredictionDetailsAsync(id, cancellationToken);
+
+        return Ok(prediction);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="grapeSortPhaseId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
